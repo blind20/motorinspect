@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <TextView android:id="@+id/tv_dlgtitle"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center"
+        android:text="校车标志灯和校车停车指示标志牌"
+        android:textSize="14sp"
+        android:textColor="@color/common_title"
+        />
+    <RadioGroup android:id="@+id/rg_sel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:padding="5dp">
+        <RadioButton android:id="@+id/rb_checkpass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/checkflg_pass"
+            android:paddingBottom="8dp"
+            android:drawablePadding="5dp"
+            android:button="@null"
+            android:text="@string/checkpass"/>
+        <RadioButton android:id="@+id/rb_checkfail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/checkflg_fail"
+            android:drawablePadding="5dp"
+            android:button="@null"
+            android:paddingBottom="8dp"
+            android:text="@string/checkfail"/>
+        <RadioButton android:id="@+id/rb_notcheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/checkflg_notcheck"
+            android:drawablePadding="5dp"
+            android:button="@null"
+            android:text="@string/notcheck"/>
+    </RadioGroup>
+
+</LinearLayout>

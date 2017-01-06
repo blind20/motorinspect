@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" 
+    android:background="@drawable/listitem_bg"
+    android:padding="15dp">
+    
+    <ImageView
+        android:id="@+id/item_imageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/checkflg_pass"
+        android:scaleType="fitCenter"/>
+    <TextView
+        android:id="@+id/item_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/item_imageview"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:text="检查更新"
+        android:textSize="16sp"
+        android:textColor="@color/dark_gray"/>
+    
+	<ImageView 
+	    android:id="@+id/item_goright"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:src="@drawable/go_right"
+	    android:layout_alignParentRight="true"
+	    android:layout_centerVertical="true"
+	    android:visibility="visible"/>
+</RelativeLayout>

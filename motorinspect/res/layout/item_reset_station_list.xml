@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+    android:descendantFocusability="blocksDescendants"
+    android:background="@drawable/listitem_bg"
+    android:padding="10dp">
+    
+    <!-- android:descendantFocusability="blocksDescendants"是防止其它控件抢占焦点 -->
+    
+    <TextView android:id="@+id/tv_jcxdh" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="#444"
+        android:textSize="16sp"
+        android:text="1号检测线"
+        />
+    
+  
+
+    <TextView android:id="@+id/tv_gwdh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_jcxdh"
+        android:layout_marginTop="10dp"
+        android:textColor="#898989"
+        android:textSize="16sp"
+        android:text="1号工位"
+        />
+    
+    
+    	
+      <Button
+        android:id="@+id/btn_reset"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_alignBottom="@id/tv_gwdh"
+        android:layout_alignParentRight="true"
+        android:text="@string/reset"
+        android:textColor="#ffffff"
+        android:background="@drawable/login_btn"
+        android:textSize="16sp"
+        />
+    
+</RelativeLayout>

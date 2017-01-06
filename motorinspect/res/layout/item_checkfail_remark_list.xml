@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/listview_bg_focus"
+    android:padding="15dp"
+    android:orientation="horizontal" >
+    
+     <ImageView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_vertical"
+             android:background="@drawable/editor_item"
+             android:scaleType="centerInside" />
+        
+        <EditText
+            android:id="@+id/et_item_remark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@null"
+            android:hint="不合格原因"
+            android:textColor="#ff353535"
+            android:textSize="12sp" />
+
+</LinearLayout>

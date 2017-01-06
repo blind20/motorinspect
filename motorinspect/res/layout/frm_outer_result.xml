@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:orientation="vertical" >
+    
+    <Button 
+        android:id="@+id/btn_autojudge"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/auto_judge"
+       	android:textColor="@color/common_title"
+        android:background="@color/white"
+        />
+	
+    <LinearLayout android:id="@+id/ll_checkresult"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:background="@color/white">
+        
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:drawableLeft="@drawable/ic_result_check"
+            android:textSize="16sp"
+            android:drawablePadding="10dp"
+            android:textColor="@color/dark_gray"
+            android:text="@string/check_result"/>
+        
+        <TextView android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"/>
+        
+        <ToggleButton 
+            android:id="@+id/togglebtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:button="@drawable/toggle_bg"
+            android:layout_marginRight="10dp"
+            android:checked="true"
+            android:textOn="@string/checkpass"
+            android:textOff="@string/checkfail"
+            android:textSize="14sp"
+            android:textColor="@color/yellow"
+            />
+    </LinearLayout>
+	<View android:layout_width="match_parent"
+	    android:layout_height="1dp"
+	    android:background="@color/border2"/>
+     <LinearLayout android:id="@+id/ll_checkdeteil"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="vertical"
+        android:background="@color/white">
+        
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_vertical"
+             android:orientation="horizontal" >
+
+             <ImageView
+                 android:id="@+id/iv_topic"
+                 android:layout_width="20dp"
+                 android:layout_height="20dp"
+                 android:layout_margin="10dp"
+                 android:src="@drawable/ic_topic" />
+
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_alignParentLeft="true"
+                 android:layout_marginTop="10dp"
+                 android:gravity="center"
+                 android:text="@string/check_fail_items"
+                 android:textColor="@color/dark_gray"
+                 android:textSize="16sp" />
+         </LinearLayout>
+        
+         <EditText 
+             android:id="@+id/et_remark"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@null"
+             android:textSize="16sp"
+             android:gravity="top"
+             android:hint="@string/check_remark"
+             android:textColorHint="@color/dark_gray"
+             />
+         
+    </LinearLayout>
+    
+</LinearLayout>

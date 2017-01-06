@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:descendantFocusability="blocksDescendants">
+
+    <RelativeLayout
+        android:id="@+id/rl_item_check"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/listitem_bg"
+        android:descendantFocusability="blocksDescendants"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/tv_seq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:singleLine="true"
+            android:text="1"
+            android:textColor="#FFA35A"
+            android:textSize="25sp" />
+
+        <ImageView
+            android:id="@+id/iv_checkflag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/checkflg_pass" />
+
+        <TextView
+            android:id="@+id/tv_checkitem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/tv_seq"
+            android:maxLines="2"
+            android:minLines="1"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="校车标志灯和校车停车指示标志牌"
+            android:textColor="@color/dark_gray"
+            android:textSize="14sp" />
+        
+        <Button android:id="@+id/btn_editor"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_toRightOf="@id/tv_checkitem"
+            android:background="@drawable/editor_item"
+            android:layout_centerVertical="true"
+            />
+    </RelativeLayout>
+    
+    <RelativeLayout android:id="@+id/rl_itemfail_reason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/light_red"
+        android:padding="10dp"
+        android:visibility="gone"
+        >
+        <TextView android:id="@+id/tv_item_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="原因："
+            android:textColor="@color/dark_gray"
+            />
+        <TextView android:id="@+id/tv_itemfail_reason"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_item_txt"
+            android:maxLines="2"
+            />
+    </RelativeLayout>
+</LinearLayout>

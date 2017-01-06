@@ -1,0 +1,78 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+
+        <RelativeLayout style="@style/ButtomBar" >
+            <ImageButton
+                android:id="@+id/buttom_waijian"
+                style="@style/ButtomBarImgBtn"
+                android:background="@drawable/bar_appearance"
+                android:contentDescription="@string/app_name" />
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/ButtomBar" >
+            <ImageButton
+                android:id="@+id/buttom_yinche"
+                style="@style/ButtomBarImgBtn"
+                android:background="@drawable/bar_pullcar"
+                android:contentDescription="@string/app_name" />
+        </RelativeLayout>
+        
+     <!--    <RelativeLayout style="@style/ButtomBar" >
+            <ImageButton
+                android:id="@+id/buttom_chassis"
+                style="@style/ButtomBarImgBtn"
+                android:background="@drawable/bar_chassis"
+                android:contentDescription="@string/app_name" />
+        </RelativeLayout>
+        
+        <RelativeLayout style="@style/ButtomBar" >
+            <ImageButton
+                android:id="@+id/buttom_dynamicchassis"
+                style="@style/ButtomBarImgBtn"
+                android:background="@drawable/bar_dynamicchassis"
+                android:contentDescription="@string/app_name" />
+        </RelativeLayout>
+        
+        <RelativeLayout style="@style/ButtomBar" 
+            android:visibility="gone">
+            <ImageButton
+                android:id="@+id/buttom_roadtest"
+                style="@style/ButtomBarImgBtn"
+                android:background="@drawable/bar_roadtest"
+                android:contentDescription="@string/app_name" />
+        </RelativeLayout> -->
+
+        <RelativeLayout style="@style/ButtomBar" >
+            <ImageButton
+                android:id="@+id/buttom_personinfo"
+                style="@style/ButtomBarImgBtn"
+                android:background="@drawable/bar_constact"
+                android:contentDescription="@string/app_name" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_above="@id/footer"
+        android:background="#CBCED2" />
+
+    <FrameLayout
+        android:id="@+id/fl_carinfo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/line" >
+    </FrameLayout>
+
+</RelativeLayout>

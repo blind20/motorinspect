@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="pernfrm_item">
+        <item>服务器设置</item>
+        <item>所属检测站</item>
+        <item>检查更新</item>
+        <item>关于我们</item>
+    </string-array>
+    
+    <string-array name="pernfrm_item_img">
+        <item>nav_per_server</item>
+        <item>nav_per_station</item>
+        <item>nav_per_update</item>
+        <item>nav_per_about</item>
+    </string-array>
+
+    
+    <string-array name="checkitems1">
+        <item>号牌号码/车辆类型</item>
+        <item>车辆品牌/型号</item>
+        <item>车辆识别代号（或整车出厂编号）</item>
+        <item>发动机号码（或电动机号码）</item>
+        <item>车辆颜色和外形</item>
+    </string-array>
+    
+    <string-array name="checkitems2">
+        <item>外廓尺寸</item>
+        <item>轴距</item>
+        <item>整备质量</item>
+        <item>核定载人数</item>
+        <item>核定载质量</item>
+        <item>栏板高度</item>
+        <item>后轴钢板弹簧片数</item>
+        <item>客车应急出口</item>
+        <item>客车乘客通道和引道</item>
+        <item>货厢</item>
+    </string-array>
+    	
+    <string-array name="checkitems3">
+        <item>车身外观</item>
+        <item>外观标识、标注和标牌</item>
+        <item>外部照明和信号灯具</item>
+        <item>轮胎</item>
+        <item>号牌及号牌安装</item>
+        <item>加装/改装灯具</item>
+    </string-array>
+    
+    <string-array name="checkitems4">
+        <item>汽车安全带</item>
+        <item>机动车用三角警告牌</item>
+        <item>灭火器</item>
+        <item>行驶记录装置</item>
+        <item>车身反光标识</item>
+        <item>车辆尾部标志板</item>
+        <item>侧后防护装置</item>
+        <item>应急锤</item>
+        <item>急救箱</item>
+        <item>限速功能或限速装置</item>
+        <item>防抱死制动装置</item>
+        <item>辅助制动装置</item>
+        <item>盘式制动器</item>
+        <item>紧急切断装置</item>
+        <item>发动机舱自动灭火装置</item>
+        <item>手动机械断电开关</item>
+        <item>副制动踏板</item>
+        <item>校车标志灯和校车停车指示标志牌</item>
+        <item>危险货物运输车标志</item>
+        <item>肢体残疾人操纵辅助装置</item>
+        <item>联网查询车辆事故/违法信息</item>
+    </string-array>
+    
+    <string-array name="checkitems6">
+        <item>转向系</item>
+        <item>传动系</item>
+        <item>制动系</item>
+        <item>仪表和指示器</item>
+    </string-array>
+    
+    <string-array name="checkitems7">
+        <item>转向系部件</item>
+        <item>传动系部件</item>
+        <item>行驶系部件</item>
+        <item>制动系部件</item>
+        <item>其它部件</item>
+    </string-array>
+    
+    
+</resources>

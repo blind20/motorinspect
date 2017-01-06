@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+    android:padding="5dp"
+    android:background="@drawable/rectangle__bg">
+    
+	<ImageView android:id="@+id/iv_card_bg"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:src="@drawable/main_card_file_hexagon_bg"/>
+	
+	<ImageView android:id="@+id/iv_card_in"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignTop="@id/iv_card_bg"
+	    android:src="@drawable/main_card_file_icon"
+	    />
+	
+	
+	<ImageView android:id="@+id/iv_goright"
+	    android:layout_width="20dp"
+	    android:layout_height="20dp"
+	    android:layout_alignParentRight="true"
+	    android:layout_marginLeft="10dp"
+	    android:layout_centerVertical="true"
+	    android:src="@drawable/go_right"/>
+	
+	<LinearLayout android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:orientation="vertical"
+	    android:layout_toRightOf="@id/iv_card_in"
+	    android:layout_toLeftOf="@id/iv_goright"
+	    android:layout_marginLeft="10dp"
+	    android:paddingTop="10dp">
+	    
+	    <TextView android:id="@+id/tv_menu_title"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textSize="16sp"
+	    android:text="@string/outer_nav1_menu1"/>
+	    
+	    <TextView android:id="@+id/tv_menu_subtitle"
+	    android:layout_marginTop="5dp"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/dark_gray"
+	    android:textSize="12sp"
+	    android:minLines="2"
+	    android:text="@string/outer_nav1_menu1"/>
+	</LinearLayout>
+	        
+</RelativeLayout>

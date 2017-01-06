@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+    android:descendantFocusability="blocksDescendants"
+    android:background="@drawable/listitem_bg"
+    android:padding="10dp">
+    
+    <!-- android:descendantFocusability="blocksDescendants"是防止其它控件抢占焦点 -->
+    
+    <TextView android:id="@+id/tv_hphm" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="#444"
+        android:textSize="16sp"
+        android:text="苏J2868J"
+        />
+    
+    
+
+    <TextView android:id="@+id/tv_hpzl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_hphm"
+        android:layout_marginTop="10dp"
+        android:textColor="#898989"
+        android:textSize="16sp"
+        android:text="小型汽车"
+        />
+    
+    <TextView android:id="@+id/tv_checkline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_hphm"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="30dp"
+        android:layout_toRightOf="@id/tv_hpzl"
+        android:text="1号线"
+        android:textColor="@color/ash"
+        />
+    
+    <Button
+        android:id="@+id/btn_pullcar"
+        android:layout_width="80dp"
+        android:layout_height="30dp"
+        android:layout_alignBottom="@id/tv_hpzl"
+        android:layout_alignParentRight="true"
+        android:text="@string/pullcar"
+        android:textColor="#ffffff"
+        android:background="@drawable/login_btn"
+        android:textSize="16sp"
+        
+        />
+    
+    <TextView android:id="@+id/tv_lsh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_hpzl"
+        android:layout_marginTop="10dp"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        android:text="20160420120910264"
+        />
+    
+    <TextView android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_hpzl"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentRight="true"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        android:text="2016-04-20"
+        />
+    
+    
+</RelativeLayout>
