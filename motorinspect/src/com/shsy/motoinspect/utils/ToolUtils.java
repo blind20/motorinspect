@@ -167,7 +167,13 @@ public class ToolUtils {
 		return getServerHost(con) + "/pda/processStart";
 	}
 	
-	
+	//联网获取平台要求检测项目
+	public static String getChekcItemUrl (Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/getChekcItem";
+	}	
 	
 
 	@SuppressLint("SimpleDateFormat")

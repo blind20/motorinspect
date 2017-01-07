@@ -19,6 +19,7 @@ import com.shsy.motoinspect.network.PersistentCookieStore;
 import com.shsy.motoinspect.ui.activity.SettingsActivity;
 import com.shsy.motoinspect.ui.fragment.SettingLoginFrm.OnLoginListener;
 import com.shsy.motoinspect.utils.Logger;
+import com.shsy.motoinspect.utils.PhoneUtils;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
 import com.shsy.motoinspect.utils.ToastUtils;
 import com.shsy.motoinspect.utils.ToolUtils;
@@ -69,7 +70,7 @@ public class PersonInfoFrm extends BaseFragment implements View.OnClickListener{
 		iv_head.setOnClickListener(this);
 		
 		mListView.setAdapter(new CommonAdapter<ItemHolder>(initItems(),
-				getActivity(),R.layout.item_dialog_define) {
+				mActivity,R.layout.item_dialog_define) {
 
 					@Override
 					public void convert(ViewHolder holder, ItemHolder t) {
@@ -87,8 +88,12 @@ public class PersonInfoFrm extends BaseFragment implements View.OnClickListener{
 					Intent intent = new Intent(mActivity,SettingsActivity.class);
 					intent.putExtra(CommonConstants.TO_SETTING, position);
 					startActivity(intent);
-				}else{
+				}else if(position == 1){
 					ToastUtils.showToast(mActivity, "¹¥³ÇÊ¨ÔÚÉý¼¶...", Toast.LENGTH_SHORT);
+				}
+				else if(position == 2){
+					String version = PhoneUtils.getVersionName(mActivity);
+					ToastUtils.showToast(mActivity, version, Toast.LENGTH_SHORT);
 				}
 			}
 		});
@@ -116,12 +121,15 @@ public class PersonInfoFrm extends BaseFragment implements View.OnClickListener{
 					public void onResponse(String response, int id) {
 						try {
 							JSONObject jo = new JSONObject(response);
-							String usr = jo.getString("userName");
-							if(usr.equals(userPref)){
+							String usr = jo.optString("userName");
+							if (TextUtils.isEmpty(usr)) {
+								return;
+							}
+							if (usr.equals(userPref)) {
 								Logger.show("getCurrentUsr", "usr = " + usr);
-								mCurrentUsr = usr;
+								mCurrentUsr = (String) usr;
 								tv_usrname.setText(mCurrentUsr);
-							}else{
+							} else {
 								mCurrentUsr = null;
 							}
 						} catch (JSONException e) {

@@ -1,5 +1,6 @@
 package com.shsy.motoinspect.ui.activity;
 
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -50,7 +51,8 @@ import com.viewpagerindicator.TabPageIndicator;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-public class OuterInspectActivity extends BaseActivity implements View.OnClickListener,OuterCheckItemsFrm.OnClickCheckItemListener{
+public class OuterInspectActivity extends BaseActivity implements View.OnClickListener,
+OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 
 	protected TitleBarView mTitleBarView;
 	
@@ -67,16 +69,14 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 	private List<CarPhotoEntity> mPohtos;
 	
 	private int mOutCheckType;
+	private String jylsh;
 	
 	private BaseApplication app ;
 	private SparseArray<CheckItemEntity> sparseArray;
 	
 	private boolean mUploadSuccessFlag = true;
+	private ProgressDialog mProgressDlg ;
 	
-	private final static int SUCCESS=1;
-	private final static int ERROR=1;
-	 
-	private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
 	
 	
 	@Override
@@ -129,7 +129,8 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 		
 		
 		carInfo = getCarInfoFromSel();
-		mPohtos = initPhotos();
+//		mPohtos = initPhotos();
+		mPohtos = new ArrayList<CarPhotoEntity>();
 		
 		mFragments = initFragments(mOutCheckType);
 		
@@ -147,7 +148,7 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 	private void checkStart() {
 		String url = ToolUtils.getProcessStartUrl(this);
 		String jyxm = getCheckJyxm(mOutCheckType);
-		String jylsh = getIntent().getStringExtra("jylsh");
+		jylsh = getIntent().getStringExtra("jylsh");
 		String jycs = getIntent().getStringExtra("jycs");
 		checkStartNetWork(url,jylsh,jyxm,jycs);
 	}
@@ -176,15 +177,9 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 		Map<String, String> headers = new HashMap<String, String>();
 		final String session = (String) SharedPreferenceUtils.get(OuterInspectActivity.this, CommonConstants.JSESSIONID, "");
 		if(TextUtils.isEmpty(session)){
-			Logger.show("checkStart", "sessionid = null");
 			return;
-		}else{
-			Logger.show("checkStart", "sessionid = "+session);
 		}
 		headers.put("Cookie", "JSESSIONID="+session);
-		
-		
-		Logger.show("checkStart", "jyxm = "+jyxm +";jylsh="+jylsh);
 		
 		OkHttpUtils.post()
 		.url(url)
@@ -243,19 +238,33 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 					start += len ;
 					String[] checkitems = app.initOuterCheckItems(i);
 					list = initDatas(checkitems,start);
-					fms.add(new OuterCheckItemsFrm(list));
+					Bundle bundle = new Bundle();
+					bundle.putString("jylsh", jylsh);
+					OuterCheckItemsFrm outerCheckItemsFrm = new OuterCheckItemsFrm(list);
+					outerCheckItemsFrm.setArguments(bundle);
+					fms.add(outerCheckItemsFrm);
 					len = checkitems.length;
 					setValueToSpareArray(list);
 				}
 				//mPohtos引用取得拍摄的照片种类
-				fms.add(new OuterPhotoFrm(mPohtos));
+				Bundle bundle = new Bundle();
+				bundle.putString("jylsh", jylsh);
+				OuterPhotoFrm outerPhotoFrm = new OuterPhotoFrm(mPohtos);
+				outerPhotoFrm.setArguments(bundle);
+				fms.add(outerPhotoFrm);
 				break;
 	
 			case CommonConstants.CHASSIS:
 				List<CheckItemEntity> chassisList = new ArrayList<CheckItemEntity>();
 				String[] chassisItems = app.initOuterCheckItems(7);
 				chassisList = initDatas(chassisItems,46);
-				fms.add(new OuterCheckItemsFrm(chassisList));
+				
+				Bundle bundle2 = new Bundle();
+				bundle2.putString("jylsh", jylsh);
+				OuterCheckItemsFrm chassis = new OuterCheckItemsFrm(chassisList);
+				chassis.setArguments(bundle2);
+				
+				fms.add(chassis);
 				setValueToSpareArray(chassisList);
 				break;
 	
@@ -263,6 +272,12 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 				List<CheckItemEntity> dynamicList = new ArrayList<CheckItemEntity>();
 				String[] dynamicLtems = app.initOuterCheckItems(6);
 				dynamicList = initDatas(dynamicLtems,42);
+				
+				Bundle bundle3 = new Bundle();
+				bundle3.putString("jylsh", jylsh);
+				OuterCheckItemsFrm dynamic = new OuterCheckItemsFrm(dynamicList);
+				dynamic.setArguments(bundle3);
+				
 				fms.add(new OuterCheckItemsFrm(dynamicList));
 				setValueToSpareArray(dynamicList);
 				break;
@@ -330,6 +345,7 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 		case R.id.title_right:
 //			MyDialogFragment myDialog = MyDialogFragment.newInstance(CommonConstants.DLG_NORMAL);
 //			myDialog.show(mManager, "");
+			showProgressDlg(mOutCheckType);
 			upload(mOutCheckType);
 			break;
 		}
@@ -338,11 +354,17 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 	
 
 	private void upload(int mOutCheckType) {
-		
 		uploadCheckItems(mOutCheckType);
 		if(CommonConstants.APPEARANCE == mOutCheckType){
 			uploadPhoto();
 		}
+	}
+
+
+	private void showProgressDlg(int mOutCheckType) {
+		mProgressDlg = new ProgressDialog(this);
+		mProgressDlg.setMessage("正在上传请等待...");
+		mProgressDlg.show();
 	}
 
 
@@ -383,14 +405,14 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 			
 			@Override
 			public void onResponse(String response, int id) {
-				Logger.show(getClass().getName(), "response"+response);
 				
-				if(mUploadSuccessFlag == true && mOutCheckType != CommonConstants.APPEARANCE ){
+				if(mUploadSuccessFlag && mOutCheckType != CommonConstants.APPEARANCE ){
 					OuterInspectActivity.this.finish();
+					mProgressDlg.dismiss();
 					showToast("检验项目上传成功");
 				}
 				//如果上传成功，并且是外观检测
-				else if(mUploadSuccessFlag == true && mOutCheckType == CommonConstants.APPEARANCE){
+				else if(mUploadSuccessFlag && mOutCheckType == CommonConstants.APPEARANCE){
 					showToast("检验项目上传成功,等待照片上传");
 				}
 			}
@@ -398,8 +420,9 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 			@Override
 			public void onError(Call call, Exception e, int id) {
 				Logger.show(getClass().getName(), "onError "+e.toString());
-				showToast("检验项目上传失败,重新点击发送按钮");
+				showToast("检验项目上传失败,重新发送");
 				mUploadSuccessFlag = false;
+				mProgressDlg.dismiss();
 			}
 		});
 	}
@@ -409,36 +432,37 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 	 *上传照片
 	 *
 	 */
-	
+	private int mCount = 0;
 	private void uploadPhoto() {
 		
-		
-		final String uploadPhotoUrl = ToolUtils.uploadPhotoUrl(OuterInspectActivity.this);
+		final String url = ToolUtils.uploadPhotoUrl(OuterInspectActivity.this);
 		String session = (String) SharedPreferenceUtils.get(this, CommonConstants.JSESSIONID, "");
 
-		if (TextUtils.isEmpty(uploadPhotoUrl) || TextUtils.isEmpty(session)) {
+		if (TextUtils.isEmpty(url) || TextUtils.isEmpty(session)) {
 			return;
 		}
+		
 		final Map<String, String> headers = new HashMap<String, String>();
 		headers.put("APP-Key", "APP-Secret222");
 		headers.put("APP-Secret", "APP-Secret111");
 		headers.put("Cookie", "JSESSIONID=" + session);
 		
-		for (int i = 0; i < mPohtos.size()-1; i++) {
-			File file = getPhotoFile(mPohtos, i);
-			Map<String, String> params = putPhotoParams(mPohtos, i);
-
-			final int count = i;
+		final List<CarPhotoEntity> photos = mPohtos;
+		for(int i = 0; i < photos.size(); i++) {
+			File file = getPhotoFile(photos, i);
+			Map<String, String> params = putPhotoParams(photos, i);
 			
-			OkHttpUtils.post().addFile("photo", "image" + i, file).url(uploadPhotoUrl).headers(headers).params(params)
+			OkHttpUtils.post().addFile("photo", "image"+i, file).url(url).headers(headers).params(params)
 			.build().execute(new StringCallback() {
 				
 				@Override
 				public void onResponse(String response, int id) {
-					Logger.show(getClass().getName(), "count:"+count);
-					if (count == mPohtos.size()-2 && mUploadSuccessFlag) {
+					Logger.show("photoresponse", "photoresponse="+response);
+					mCount++;
+					if (mCount == photos.size() && mUploadSuccessFlag) {
 						OuterInspectActivity.this.finish();
 						showToast("照片上传成功");
+						mProgressDlg.dismiss();
 					}
 				}
 
@@ -447,12 +471,11 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 					e.printStackTrace();
 					mUploadSuccessFlag = false;
 					showToast("照片上传失败,重新上传");
+					mProgressDlg.dismiss();
 				}
 			});
 		}
-				
 	}
-
 
 
 
@@ -538,6 +561,13 @@ public class OuterInspectActivity extends BaseActivity implements View.OnClickLi
 	public void onClickCheckItem(CheckItemEntity item) {
 		Logger.show(TAG, "********");
 		Logger.show(TAG, "item="+item.getSeq());
+	}
+
+
+
+	@Override
+	public void OnAddPhotoItem(CarPhotoEntity carPhotoEntity) {
+		mPohtos.add(carPhotoEntity);
 	}
 
 

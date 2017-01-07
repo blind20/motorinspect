@@ -5,20 +5,31 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.shsy.motoinspect.BaseFragment;
 import com.shsy.motoinspect.CommonConstants;
 import com.shsy.motoinspect.adapter.GridAdapter;
 import com.shsy.motoinspect.entity.CarPhotoEntity;
+import com.shsy.motoinspect.ui.activity.OuterInspectActivity;
 import com.shsy.motoinspect.utils.DensityUtil;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.PictureUtil;
+import com.shsy.motoinspect.utils.SharedPreferenceUtils;
 import com.shsy.motoinspect.utils.TakePhotoUtil;
 import com.shsy.motoinspect.utils.ToastUtils;
 import com.shsy.motoinspect.utils.ToolUtils;
 import com.shsy.motorinspect.R;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -35,6 +46,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import okhttp3.Call;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -54,6 +66,7 @@ public class OuterPhotoFrm extends BaseFragment {
 	
 	private Context context;
 	private int mPosition;
+	private String jylsh;
 	
 	//拍照原图
 	private final static int OriginType = 0;
@@ -72,6 +85,7 @@ public class OuterPhotoFrm extends BaseFragment {
 	
 	public static final String PHOTO_IS_MUST = "1";
 	public static final String PHOTO_NOT_MUST = "0";
+	private ProgressDialog mProgressDlg ;
 	
 	/**
 	 * 无参构造函数必须要,
@@ -89,11 +103,11 @@ public class OuterPhotoFrm extends BaseFragment {
 	}
 	
 	
-	/*protected OnCheckItemListener mListener;
+	protected OnPhotoItemListener mListener;
 	
-	public interface OnCheckItemListener{
-		public void onCheckItem(int arrayInCurFrmPosition , int seq);
-	}*/
+	public interface OnPhotoItemListener{
+		public void OnAddPhotoItem(CarPhotoEntity carPhotoEntity);
+	}
 	
 	
 	
@@ -111,17 +125,17 @@ public class OuterPhotoFrm extends BaseFragment {
 	}
 	
 	
-	/*@Override
+	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			mListener = (OnCheckItemListener) mActivity;
+			mListener = (OnPhotoItemListener) mActivity;
 		} catch (ClassCastException e) {
 			e.printStackTrace();
 			throw new ClassCastException(mActivity.toString()
 					+ " must implement OnHeadlineSelectedListener");
 		}
-	}*/
+	}
 
 
 	/**
@@ -150,10 +164,55 @@ public class OuterPhotoFrm extends BaseFragment {
 	@Override
 	public void initParam() {
 		findView();
-		mInitList = initPhotoGrid();
-		viewSetAdapter();
+		initViewsByJylsh();
 	}
 
+
+	private void initViewsByJylsh() {
+		jylsh = getArguments().getString("jylsh");
+		String url = ToolUtils.getChekcItemUrl(mActivity);
+		Map<String, String> headers = new HashMap<String, String>();
+		final String session = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.JSESSIONID, "");
+		headers.put("Cookie", "JSESSIONID="+session);
+		
+		OkHttpUtils.post()
+		.url(url)
+		.headers(headers)
+		.addParams("jylsh", jylsh)
+		.addParams("type", CommonConstants.WGJYZP)
+		.build()
+		.execute(new StringCallback() {
+			
+			@Override
+			public void onResponse(String response, int id) {
+				try {
+					if(TextUtils.isEmpty(response)){
+						ToastUtils.showToast(mActivity, "网络异常", Toast.LENGTH_LONG);
+						return;
+					}
+					
+					String cyzp = response.toString();
+					String[] zps = cyzp.split(",");
+					
+					Logger.show("zpszps", "zpszps");
+					if(!TextUtils.isEmpty(cyzp)){
+						mInitList = markMustUpload(zps);
+						viewSetAdapter();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			@Override
+			public void onError(Call call, Exception e, int id) {
+				ToastUtils.showToast(mActivity, "请重新选择车辆", Toast.LENGTH_LONG);
+				mInitList = initPhotoGrid();
+				viewSetAdapter();
+			}
+		});
+	}
+	
 
 	@Override
 	public int getLayoutResID() {
@@ -161,8 +220,26 @@ public class OuterPhotoFrm extends BaseFragment {
 	}
 	
 	
+	
+	private List<CarPhotoEntity> markMustUpload(String[] cyzp) {
+		List<CarPhotoEntity> list = initPhotoGrid();
+		for(CarPhotoEntity carPhotoEntity : list){
+			String photoTypeCode = carPhotoEntity.getPhotoTypeCode();
+			for(String code: cyzp){
+				if(code.equals(photoTypeCode)){
+					carPhotoEntity.setIsMustFlag(OuterPhotoFrm.PHOTO_IS_MUST);
+					break;
+				}
+			}
+		}
+		return list;
+	}
+
 	private void findView() {
 		mGridView = (GridView) mRootView.findViewById(R.id.grid_photo);
+		mProgressDlg = new ProgressDialog(mActivity);
+		mProgressDlg.setMessage("加载平台指定拍摄的照片,请等待");
+		mProgressDlg.show();
 	}
 	
 	
@@ -178,7 +255,7 @@ public class OuterPhotoFrm extends BaseFragment {
 	 * 
 	 */
 	private void viewSetAdapter() {
-		
+		mProgressDlg.dismiss();
 		gridAdapter = new GridAdapter(mActivity, mInitList, 0);
 		mGridView.setAdapter(gridAdapter);
 		
@@ -199,12 +276,12 @@ public class OuterPhotoFrm extends BaseFragment {
 					//拍摄照片
 					//判断SD卡状态
 					if(getSdcarState()){
-//						timeStamp = getCurrentTimeStamp();
-//						startCaptureAty(timeStamp);
-						String txt = getResources().getString(R.string.select_photo_type);
-						MyDialogFragment myDialog = MyDialogFragment.newInstance(MyDialogFragment.DLG_PHOTO_TYPE);
-						myDialog.setTargetFragment(OuterPhotoFrm.this, OuterPhotoFrm.REQ_SELECT_PHOTO);
-						myDialog.show(getFragmentManager(), txt);
+						timeStamp = getCurrentTimeStamp();
+						startCaptureAty(timeStamp);
+//						String txt = getResources().getString(R.string.select_photo_type);
+//						MyDialogFragment myDialog = MyDialogFragment.newInstance(MyDialogFragment.DLG_PHOTO_TYPE);
+//						myDialog.setTargetFragment(OuterPhotoFrm.this, OuterPhotoFrm.REQ_SELECT_PHOTO);
+//						myDialog.show(getFragmentManager(), txt);
 					}else{
 						ToastUtils.showToast(mActivity, getActivity().getString(R.string.sd_disable), Toast.LENGTH_LONG);
 					}
@@ -249,26 +326,16 @@ public class OuterPhotoFrm extends BaseFragment {
 	    	
 	    	String[] pathArray = createUploadAndThumbnailFile(timeStamp, OuterPhotoFrm.UploadQuality);
 	    	//没有拍摄,直接返回
-	    	if(-1 == mWhich ||pathArray ==null){
+	    	if(pathArray ==null){
 	    		return;
 	    	}
-	    	
-	        List<CarPhotoEntity> list = new ArrayList<CarPhotoEntity>();
-	        list = TakePhotoUtil.initFullPhotoList(context);
-	        
-	        //不选择照片种类,直接拍摄
-//	        list = ToolUtils.remainPhotoList(context,mInitList,ToolUtils.initFullPhotoList(context));
 	        
 	        CarPhotoEntity carPhoto = mInitList.get(mPosition);
-	        carPhoto.setPhotoTypeCode(list.get(mWhich).getPhotoTypeCode());
-	        carPhoto.setPhotoTypeName((list.get(mWhich).getPhotoTypeName()));
 	        carPhoto.setThumbnailBmp(BitmapFactory.decodeFile(pathArray[1]));
 	        carPhoto.setUploadPhotoFilePath(pathArray[0]);
 	        carPhoto.setThumbnailPhotoFilePath(pathArray[1]);
+	        mListener.OnAddPhotoItem(carPhoto);
 	        
-	        Bitmap addPicBmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_photo_add);
-	        CarPhotoEntity addPhotoNew = new CarPhotoEntity("", "", addPicBmp,"","",OuterPhotoFrm.PHOTO_NOT_MUST);
-	        mInitList.add(addPhotoNew);
 	        gridAdapter.setData(mInitList);
 	        gridAdapter.notifyDataSetChanged();
 	    }

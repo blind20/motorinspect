@@ -263,7 +263,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 
 	private void viewSetAdapter() {
 		
-		adapter = new CommonAdapter<CarListInfoEntity>(mCarList,this.getActivity(),R.layout.item_carinspect_list) {
+		adapter = new CommonAdapter<CarListInfoEntity>(mCarList,mActivity,R.layout.item_carinspect_list) {
 
 			@Override
 			public void convert(ViewHolder holder, CarListInfoEntity t) {
@@ -283,7 +283,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 					int position, long id) {
 				
 				
-				Intent intent = new Intent(getActivity(), OuterInspectActivity.class);
+				Intent intent = new Intent(mActivity, OuterInspectActivity.class);
 				Bundle bundle = new Bundle();
 				bundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, mCarList.get(position));
 				bundle.putInt(OUTCHECKTYPE, mOutCheckType);

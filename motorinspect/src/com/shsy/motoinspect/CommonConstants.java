@@ -82,4 +82,11 @@ public class CommonConstants {
 	public final static int RESET = 4;
 	public final static int SENDBACK = 5;
 	
+	
+	
+	//getChekcItem  ÇëÇó²ÎÊý type
+	public final static String DTDPJYXM = "dtdpjyxm";
+	public final static String WGJYXM = "wgjyxm";
+	public final static String DPJYXM = "dpjyxm";
+	public final static String WGJYZP = "wgjyzp";
 }

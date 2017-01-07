@@ -24,6 +24,9 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
 	public CommonAdapter(List<T> mDatas, Context context, int layoutId) {
 		this.mDatas = mDatas;
 		this.mContext = context;
+		if(context == null){
+			Logger.show("**CommonAdapter**", "contxt is null");
+		}
 		mInflater = LayoutInflater.from(context);
 		this.layoutId = layoutId;
 	}

@@ -4,7 +4,7 @@
     <string-array name="pernfrm_item">
         <item>服务器设置</item>
         <item>所属检测站</item>
-        <item>检查更新</item>
+        <item>检查版本</item>
         <item>关于我们</item>
     </string-array>
     

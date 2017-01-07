@@ -3,11 +3,13 @@ package com.shsy.motoinspect.adapter;
 import java.util.List;
 
 import com.shsy.motoinspect.entity.CarPhotoEntity;
+import com.shsy.motoinspect.ui.fragment.OuterPhotoFrm;
 import com.shsy.motoinspect.utils.DensityUtil;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motorinspect.R;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -37,10 +39,6 @@ public class GridAdapter extends BaseAdapter {
 	
 	public void setData(List<CarPhotoEntity> mCopyList){
 		this.photoList= mCopyList;
-		for(CarPhotoEntity entity:photoList){
-			Logger.show("CarPhotoEntity:", entity.getUploadPhotoFilePath()+","+entity.getThumbnailPhotoFilePath());
-		}
-		
 	}
 	
 	@Override
@@ -72,7 +70,13 @@ public class GridAdapter extends BaseAdapter {
 		
 		viewHolder.imageView.setImageBitmap(photoList.get(position).getThumbnailBmp());
 		viewHolder.textview.setText(photoList.get(position).getPhotoTypeName());
-		if(position == getCount()-1){
+		if(photoList.get(position).getIsMustFlag().equals(OuterPhotoFrm.PHOTO_IS_MUST)){
+			viewHolder.textview.setBackgroundResource(R.color.light_red);
+		}else{
+			viewHolder.textview.setBackgroundResource(R.color.common_title);
+		}
+		
+		if(TextUtils.isEmpty(photoList.get(position).getUploadPhotoFilePath())){
 			viewHolder.imageDelete.setVisibility(View.INVISIBLE);
 		}else{
 			viewHolder.imageDelete.setVisibility(View.VISIBLE);

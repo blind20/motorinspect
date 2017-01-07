@@ -211,7 +211,7 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 		
 		final String lineNameFormat = getResources().getString(R.string.check_line_num);
 		
-		adpter = new CommonAdapter<CarListInfoEntity>(mCarList,this.getActivity(),R.layout.item_pullcar_list) {
+		adpter = new CommonAdapter<CarListInfoEntity>(mCarList,mActivity,R.layout.item_pullcar_list) {
 
 			@Override
 			public void convert(ViewHolder holder, final CarListInfoEntity t) {
