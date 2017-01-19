@@ -53,6 +53,9 @@
     <color name="transparent">#00000000</color>
     <color name="yellow">#FFCC7E</color>
     <color name="light_red">#FDC3B1</color>
+    <color name="deep_red">#AA4040</color>
     <color name="frm_menu_bg">#EDF2F7</color>
+    <color name="text_color_gray">#898989</color>
+    
     <color name="subtitle_lightblue">#20C9EE</color>
 </resources>

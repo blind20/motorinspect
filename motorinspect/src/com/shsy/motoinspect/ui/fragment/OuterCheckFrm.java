@@ -297,13 +297,6 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
 	private String convertCode(String hpzlCode) {
 		return ToolUtils.getLableByCode(mActivity, hpzlCode, R.array.hpzl, R.array.hpzl_code);
 	}

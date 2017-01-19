@@ -80,7 +80,8 @@ public class CommonConstants {
 	public final static int DYNAMIC = 2;
 	public final static int PULLCAR = 3;
 	public final static int RESET = 4;
-	public final static int SENDBACK = 5;
+	public final static int ROADTEST = 5;
+	public final static int REPHOTO = 6;
 	
 	
 	

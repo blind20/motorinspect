@@ -105,7 +105,10 @@ public class GridAdapter extends BaseAdapter {
 			if(mPos == getCount()-1){
 				return;
 			}
-			photoList.remove(mPos);
+			photoList.get(mPos).setThumbnailBmp(null);
+			photoList.get(mPos).setThumbnailPhotoFilePath("");
+			photoList.get(mPos).setUploadPhotoFilePath("");
+//			photoList.remove(mPos);
 			setData(photoList);
 			notifyDataSetChanged();
 //			ToastUtils.showToast(context, "mPos:"+mPos, Toast.LENGTH_SHORT);

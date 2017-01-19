@@ -86,6 +86,7 @@ public class OuterPhotoFrm extends BaseFragment {
 	public static final String PHOTO_IS_MUST = "1";
 	public static final String PHOTO_NOT_MUST = "0";
 	private ProgressDialog mProgressDlg ;
+	private boolean isRePhoto=false;
 	
 	/**
 	 * 无参构造函数必须要,
@@ -97,7 +98,6 @@ public class OuterPhotoFrm extends BaseFragment {
 	}
 	
 	public OuterPhotoFrm(List<CarPhotoEntity> datas) {
-		Logger.show("datas", datas.toString());
 		mInitList = datas;
 		
 	}
@@ -109,11 +109,19 @@ public class OuterPhotoFrm extends BaseFragment {
 		public void OnAddPhotoItem(CarPhotoEntity carPhotoEntity);
 	}
 	
-	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		isRePhoto = getArguments().getBoolean("isrephoto", false);
+		if(!isRePhoto){
+			jylsh = getArguments().getString("jylsh");
+		}
+	}
 	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		
 		if(savedInstanceState != null ){
 			isRecycle = savedInstanceState.getBoolean("isRecycle");
 			if(isRecycle){
@@ -164,12 +172,17 @@ public class OuterPhotoFrm extends BaseFragment {
 	@Override
 	public void initParam() {
 		findView();
-		initViewsByJylsh();
+		if(isRePhoto){
+			fullPhoto();
+		}else{
+			initViewsByJylsh();
+		}
 	}
 
 
 	private void initViewsByJylsh() {
-		jylsh = getArguments().getString("jylsh");
+		
+		
 		String url = ToolUtils.getChekcItemUrl(mActivity);
 		Map<String, String> headers = new HashMap<String, String>();
 		final String session = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.JSESSIONID, "");
@@ -194,7 +207,6 @@ public class OuterPhotoFrm extends BaseFragment {
 					String cyzp = response.toString();
 					String[] zps = cyzp.split(",");
 					
-					Logger.show("zpszps", "zpszps");
 					if(!TextUtils.isEmpty(cyzp)){
 						mInitList = markMustUpload(zps);
 						viewSetAdapter();
@@ -206,11 +218,16 @@ public class OuterPhotoFrm extends BaseFragment {
 			
 			@Override
 			public void onError(Call call, Exception e, int id) {
-				ToastUtils.showToast(mActivity, "请重新选择车辆", Toast.LENGTH_LONG);
-				mInitList = initPhotoGrid();
-				viewSetAdapter();
+				ToastUtils.showToast(mActivity, "网络问题,重新选择车辆", Toast.LENGTH_LONG);
+				fullPhoto();
 			}
 		});
+	}
+	
+	
+	private void fullPhoto(){
+		mInitList = initPhotoGrid();
+		viewSetAdapter();
 	}
 	
 

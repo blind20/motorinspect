@@ -21,6 +21,8 @@ public class TabAdapter extends FragmentPagerAdapter {
 			{ "底盘部件检查"};
 	public static String[] DYNAMICTITLES = new String[]
 			{ "底盘动态检验"};
+	public static String[] REPHOTOTITLES = new String[]
+			{ "重拍或补拍"};
 	public String[] TITLES;
 	
 	public List<Fragment> mFragments;
@@ -45,6 +47,11 @@ public class TabAdapter extends FragmentPagerAdapter {
 			case CommonConstants.DYNAMIC:
 				TITLES = DYNAMICTITLES;
 				break;
+			
+			case CommonConstants.REPHOTO:
+				TITLES = REPHOTOTITLES;
+				break;
+			
 		}
 	}
 

@@ -15,11 +15,14 @@ import com.shsy.motoinspect.common.TitleBarView;
 import com.shsy.motoinspect.common.ViewHolder;
 import com.shsy.motoinspect.entity.CarListInfoEntity;
 import com.shsy.motoinspect.network.ListCarInfoCallback;
+import com.shsy.motoinspect.ui.activity.OuterInspectActivity;
+import com.shsy.motoinspect.ui.activity.SettingsActivity;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
 import com.shsy.motoinspect.utils.ToolUtils;
 import com.shsy.motorinspect.R;
 import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.builder.PostFormBuilder;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import android.app.Activity;
@@ -32,6 +35,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import okhttp3.Call;
 
@@ -52,6 +57,11 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 	private SwipeRefreshLayout mSwipeLayout;
 	public static final int REFRESH_COMPLETE = 0X110; 
 	public static final int REQ_CONFIRM_DLG =0x120;
+	
+	public static final int TO_ROADTESTFRM = 0x100;
+	public static final String ROADTEST_HPHM ="hphm";
+	public static final String ROADTEST_JYLSH ="jylsh";
+	
 	private Integer mPosition;
 	private String msgFormat;
 	
@@ -87,7 +97,7 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 		if(extra.equals(getString(R.string.outer_nav2_menu1))){
 			return CommonConstants.PULLCAR;
 		}
-		return CommonConstants.SENDBACK;
+		return CommonConstants.ROADTEST;
 	}
 	
 	
@@ -131,8 +141,8 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 				mTitleBarView.setTitle(R.string.pullcar);
 				break;
 	
-			case CommonConstants.SENDBACK:
-				mTitleBarView.setTitle(R.string.sendback_cars);
+			case CommonConstants.ROADTEST:
+				mTitleBarView.setTitle(R.string.roadtest_pullcar);
 				break;
 		}
 		
@@ -165,8 +175,8 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 				url = ToolUtils.pullCarsUrl(mActivity);
 				break;
 	
-			case CommonConstants.SENDBACK:
-				url = ToolUtils.pullCarsUrl(mActivity);
+			case CommonConstants.ROADTEST:
+				url = ToolUtils.getExternalRURL(mActivity);
 				break;
 
 		}
@@ -175,7 +185,7 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 
 
 	private void getCarListNetwork(final int type) {
-		String url = getAvailUrl(type);
+		final String url = getAvailUrl(type);
 		Map<String, String> headers = new HashMap<String, String>();
 		String session = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.JSESSIONID, "");
 		if(TextUtils.isEmpty(session)){
@@ -183,10 +193,14 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 		}
 		headers.put("Cookie", "JSESSIONID="+session);
 		
-		OkHttpUtils.post()
-		.url(url).headers(headers)
-		.addParams("status", Integer.toString(CommonConstants.WAITPULLCAR))
-		.build()
+		PostFormBuilder postFormBuilder = OkHttpUtils.post()
+				.url(url).headers(headers);
+		
+		if(type ==CommonConstants.PULLCAR){
+			postFormBuilder.addParams("status", Integer.toString(CommonConstants.WAITPULLCAR));
+		}
+		
+		postFormBuilder.build()
 		.execute(new ListCarInfoCallback(){
 
 			@Override
@@ -209,47 +223,103 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 
 	private void viewSetAdapter(final int type) {
 		
-		final String lineNameFormat = getResources().getString(R.string.check_line_num);
 		
 		adpter = new CommonAdapter<CarListInfoEntity>(mCarList,mActivity,R.layout.item_pullcar_list) {
 
 			@Override
-			public void convert(ViewHolder holder, final CarListInfoEntity t) {
-				
-				String sFinal = String.format(lineNameFormat, t.getJcxdh());
-				
-				holder.setText(R.id.tv_hphm, t.getHphm())
-					  .setText(R.id.tv_hpzl, convertCode(t.getHpzl()))
-					  .setText(R.id.tv_lsh, t.getLsh())
-					  .setText(R.id.tv_date, t.getDate())
-					  .setText(R.id.tv_checkline,sFinal);
-				
-				if(type == CommonConstants.SENDBACK){
-					holder.setButtonText(R.id.btn_pullcar, getString(R.string.veh_sendback));
-					msgFormat = getString(R.string.is_confirm_sendback);
+			public void convert(ViewHolder holder, CarListInfoEntity t) {
+				String lineNameFormat = getString(R.string.check_line_num);
+				if(type == CommonConstants.PULLCAR){
+					pullcarConvertView(lineNameFormat, holder, t);
 				}else{
-					msgFormat = getString(R.string.is_confirm_pullcar);
+					roadtestConvertView(holder,t);
 				}
-
-				mPosition = holder.getPosition();
-				
-				holder.setButtonListen(R.id.btn_pullcar, new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						MyDialogFragment dialog = MyDialogFragment.newInstance(MyDialogFragment.DLG_CONFIRM, 
-																	t.getHphm(),
-																	String.format(msgFormat, t.getHphm()),
-																	REQ_CONFIRM_DLG);
-						dialog.setTargetFragment(PullCarToLineFrm.this, REQ_CONFIRM_DLG);
-						dialog.show(getFragmentManager(), "");
-					}
-				});
 				
 			}
+
 		};
 		
 		mListView.setAdapter(adpter);
+		listviewItemClick(type);
 	}
+	
+
+
+	/**
+	 * 路试每个Item的渲染
+	 * @param holder
+	 * @param t
+	 */
+	private void roadtestConvertView(ViewHolder holder, CarListInfoEntity t) {
+		holder.setText(R.id.tv_hphm, t.getHphm())
+		  .setText(R.id.tv_hpzl, convertCode(t.getHpzl()))
+		  .setText(R.id.tv_lsh, t.getLsh())
+		  .setText(R.id.tv_date, t.getDate());
+		holder.getView(R.id.tv_checkline).setVisibility(View.GONE);
+		holder.getView(R.id.btn_pullcar).setVisibility(View.GONE);
+	}
+	
+	
+	
+	
+	/**
+	 * 引车上线每个Item的渲染,Button的点击事件
+	 * @param lineNameFormat
+	 * @param holder
+	 * @param t
+	 */
+	private void pullcarConvertView(String lineNameFormat, final ViewHolder holder,
+			final CarListInfoEntity t) {
+		String sFinal = String.format(lineNameFormat, t.getJcxdh());
+		
+		holder.setText(R.id.tv_hphm, t.getHphm())
+		  .setText(R.id.tv_hpzl, convertCode(t.getHpzl()))
+		  .setText(R.id.tv_lsh, t.getLsh())
+		  .setText(R.id.tv_date, t.getDate())
+		  .setText(R.id.tv_checkline,sFinal);
+		
+		msgFormat = getString(R.string.is_confirm_pullcar);
+
+		holder.setButtonListen(R.id.btn_pullcar, new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mPosition = holder.getPosition();
+				MyDialogFragment dialog = MyDialogFragment.newInstance(MyDialogFragment.DLG_CONFIRM, 
+															t.getHphm(),
+															String.format(msgFormat, t.getHphm()),
+															REQ_CONFIRM_DLG);
+				dialog.setTargetFragment(PullCarToLineFrm.this, REQ_CONFIRM_DLG);
+				dialog.show(getFragmentManager(), "");
+			}
+		});
+	}
+
+
+	
+
+	
+	
+	private void listviewItemClick(int type) {
+		if(type == CommonConstants.PULLCAR){
+			return;
+		}else{
+			
+			mListView.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					Intent intent = new Intent(mActivity, SettingsActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putInt(CommonConstants.TO_SETTING, PullCarToLineFrm.TO_ROADTESTFRM);
+					bundle.putString(PullCarToLineFrm.ROADTEST_HPHM, mCarList.get(position).getHphm());
+					bundle.putString(PullCarToLineFrm.ROADTEST_JYLSH, mCarList.get(position).getLsh());
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
+			});;
+		}
+	}
+	
 	
 	
 	private void pushCarOnLineNetwork(final int position, String pushCarOnlineUrl,int type) {
@@ -310,8 +380,9 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == PullCarToLineFrm.REQ_CONFIRM_DLG){
-			//引车或者退办
+			//引车或者路试
 			String url = ToolUtils.pushCarOnlineUrl(mActivity);
+			Logger.show("pullcar==", "mPosition"+mPosition);
 			pushCarOnLineNetwork(mPosition,url,mType);
 		}
 	}
@@ -342,4 +413,5 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 					+ " must implement OnCarItemSelListener");
 		}
 	}
+	
 }

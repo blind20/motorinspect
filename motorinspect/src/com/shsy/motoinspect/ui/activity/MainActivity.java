@@ -6,6 +6,7 @@ import com.shsy.motoinspect.CommonConstants;
 import com.shsy.motoinspect.ui.fragment.SettingLoginFrm;
 import com.shsy.motoinspect.ui.fragment.PersonInfoFrm;
 import com.shsy.motoinspect.ui.fragment.PullCarToLineFrm;
+import com.shsy.motoinspect.ui.fragment.RePhotoFrm;
 import com.shsy.motoinspect.ui.fragment.ResetWorkFrm;
 import com.shsy.motoinspect.ui.fragment.NavigationFrm;
 import com.shsy.motoinspect.ui.fragment.OuterCheckFrm;
@@ -26,7 +27,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 													NavigationFrm.OnMenuSelListener,
 													OuterCheckFrm.OnOuterCheckBackListener,
 													PullCarToLineFrm.OnPullBackListener,
-													ResetWorkFrm.OnResetBackListener{
+													ResetWorkFrm.OnResetBackListener,
+													RePhotoFrm.OnRePhotoBackListener{
 
 	private ImageButton buttom_waijian;
 	private ImageButton buttom_yinche;
@@ -222,6 +224,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 				||menuTitle.equals(getString(R.string.outer_nav2_menu3))){
 			
 			ft.replace(R.id.fl_carinfo, PullCarToLineFrm.instantiate(MainActivity.this, PullCarToLineFrm.class.getName(),bundle));
+			
+		}else if(menuTitle.equals(getString(R.string.outer_nav1_menu4))){
+			
+			ft.replace(R.id.fl_carinfo, RePhotoFrm.instantiate(MainActivity.this, RePhotoFrm.class.getName(),bundle));
 		}
 			
 		ft.commit();
@@ -244,6 +250,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 		onPullBack();
 	}
 
-
+	@Override
+	public void onRePhotoBack() {
+		onOuterCheckBack();
+	}
 
 }

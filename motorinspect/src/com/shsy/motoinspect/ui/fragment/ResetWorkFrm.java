@@ -247,17 +247,15 @@ public class ResetWorkFrm extends BaseFragment implements SwipeRefreshLayout.OnR
 		adpter = new CommonAdapter<WorkStation>(mWorkStationList,mActivity,R.layout.item_reset_station_list) {
 
 			@Override
-			public void convert(ViewHolder holder, final WorkStation t) {
+			public void convert(final ViewHolder holder, final WorkStation t) {
 				holder.setText(R.id.tv_jcxdh, t.jcxdh)
 					  .setText(R.id.tv_gwdh, t.wsxh);
 				
-				
-				mPosition = holder.getPosition();
 				final String format = getString(R.string.is_confirm_reset);
 				holder.setButtonListen(R.id.btn_reset, new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						
+						mPosition = holder.getPosition();
 						MyDialogFragment dialog = MyDialogFragment.newInstance(MyDialogFragment.DLG_CONFIRM, 
 																				getString(R.string.reset),
 																				String.format(format, t.jcxdh+t.wsxh),
@@ -274,6 +272,18 @@ public class ResetWorkFrm extends BaseFragment implements SwipeRefreshLayout.OnR
 	}
 	
 	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == ResetWorkFrm.REQ_CONFIRM_DLG){
+			String url = ToolUtils.getReStartUrl(mActivity);
+			Logger.show("mPosition", "mPosition="+mPosition);
+			restartWorkStation(mPosition,url);
+		}
+	}
+	
+	
+	
 	private void restartWorkStation(final int position, String url) {
 		Map<String, String> headers = new HashMap<String, String>();
 		String session = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.JSESSIONID, "");
@@ -281,6 +291,7 @@ public class ResetWorkFrm extends BaseFragment implements SwipeRefreshLayout.OnR
 			return;
 		}
 		headers.put("Cookie", "JSESSIONID="+session);
+		Logger.show("mWorkStationList", "id ="+mWorkStationList.get(position).id);
 		
 		OkHttpUtils.post().url(url).headers(headers)
 		.addParams("id", mWorkStationList.get(position).id)
@@ -321,14 +332,7 @@ public class ResetWorkFrm extends BaseFragment implements SwipeRefreshLayout.OnR
 	}
 	
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == ResetWorkFrm.REQ_CONFIRM_DLG){
-			String url = ToolUtils.getReStartUrl(mActivity);
-			restartWorkStation(mPosition,url);
-		}
-	}
+	
 	
 
 	@Override

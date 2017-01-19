@@ -135,6 +135,30 @@ public class ToolUtils {
 		return getServerHost(con) + "/pda/externalC1";
 	}
 	
+	// 上传路试URL
+	public static String getExternalRURL(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/getExternalR";
+	}	
+	
+	// 路试时间URL
+	public static String getRoadProcessURL(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/getRoadProcess";
+	}
+	
+	//路试动作
+	public static String roadProcessURL(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/roadProcess";
+	}
+	
 	// 获取当前用户url
 	public static String getCurrentUserUrl(Context con) {
 		if ("".equals(getServerHost(con))) {
@@ -173,6 +197,15 @@ public class ToolUtils {
 			return "";
 		}
 		return getServerHost(con) + "/pda/getChekcItem";
+	}	
+	
+	
+	// 补拍照片
+	public static String getVehInOfHphmUrl(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/getVehInOfHphm";
 	}	
 	
 

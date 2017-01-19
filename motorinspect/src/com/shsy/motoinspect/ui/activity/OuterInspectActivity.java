@@ -122,7 +122,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 		app = (BaseApplication) getApplication();
 		mOutCheckType = getIntent().getExtras().getInt(OuterCheckFrm.OUTCHECKTYPE);
 		
-		checkStart();
+		checkStart(mOutCheckType);
 		
 		Logger.show(getClass().getName(), "mOutCheckType:"+mOutCheckType);
 		sparseArray = new SparseArray<CheckItemEntity>();
@@ -145,11 +145,15 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 	
 	
 	
-	private void checkStart() {
+	private void checkStart(int checkType) {
+		if(checkType == CommonConstants.REPHOTO){
+			return;
+		}
 		String url = ToolUtils.getProcessStartUrl(this);
 		String jyxm = getCheckJyxm(mOutCheckType);
 		jylsh = getIntent().getStringExtra("jylsh");
 		String jycs = getIntent().getStringExtra("jycs");
+		showProgressDlg(mOutCheckType, "获取开始时间,检测开始");
 		checkStartNetWork(url,jylsh,jyxm,jycs);
 	}
 
@@ -203,8 +207,10 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 						ToastUtils.showToast(OuterInspectActivity.this, "检测开始", 
 								Toast.LENGTH_SHORT);
 					}
+					mProgressDlg.dismiss();
 				} catch (JSONException e) {
 					e.printStackTrace();
+					mProgressDlg.dismiss();
 				}
 				
 			}
@@ -212,6 +218,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 			@Override
 			public void onError(Call call, Exception e, int id) {
 				ToastUtils.showToast(OuterInspectActivity.this, "请检查网络", 0);
+				mProgressDlg.dismiss();
 				e.printStackTrace();
 			}
 		});
@@ -281,6 +288,14 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 				fms.add(new OuterCheckItemsFrm(dynamicList));
 				setValueToSpareArray(dynamicList);
 				break;
+			
+			case CommonConstants.REPHOTO:
+				OuterPhotoFrm rePhoto = new OuterPhotoFrm(mPohtos);
+				Bundle rePhotoBundle = new Bundle();
+				rePhotoBundle.putBoolean("isrephoto", true);
+				rePhoto.setArguments(rePhotoBundle);
+				fms.add(rePhoto);;
+				break;
 		}
 		return fms;
 
@@ -343,9 +358,8 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 			break;
 			
 		case R.id.title_right:
-//			MyDialogFragment myDialog = MyDialogFragment.newInstance(CommonConstants.DLG_NORMAL);
-//			myDialog.show(mManager, "");
-			showProgressDlg(mOutCheckType);
+			String txt = "正在上传请等待...";
+			showProgressDlg(mOutCheckType,txt);
 			upload(mOutCheckType);
 			break;
 		}
@@ -354,16 +368,25 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 	
 
 	private void upload(int mOutCheckType) {
-		uploadCheckItems(mOutCheckType);
 		if(CommonConstants.APPEARANCE == mOutCheckType){
+			
+			uploadCheckItems(mOutCheckType);
+			uploadPhoto();
+			
+		}else if(mOutCheckType == CommonConstants.CHASSIS || 
+				mOutCheckType==CommonConstants.DYNAMIC){
+			
+			uploadCheckItems(mOutCheckType);
+			
+		}else if(mOutCheckType == CommonConstants.REPHOTO){
 			uploadPhoto();
 		}
 	}
 
 
-	private void showProgressDlg(int mOutCheckType) {
+	private void showProgressDlg(int mOutCheckType,String txt) {
 		mProgressDlg = new ProgressDialog(this);
-		mProgressDlg.setMessage("正在上传请等待...");
+		mProgressDlg.setMessage(txt);
 		mProgressDlg.show();
 	}
 

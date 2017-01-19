@@ -100,6 +100,7 @@ public class NavigationFrm extends BaseFragment {
 			list.add(new MenuItemEntity(R.drawable.main_card_memory_icon,getString(R.string.outer_nav1_menu1),getString(R.string.outer_nav1_menu1_des)));
 			list.add(new MenuItemEntity(R.drawable.main_card_file_icon,getString(R.string.outer_nav1_menu2),getString(R.string.outer_nav1_menu2_des)));
 			list.add(new MenuItemEntity(R.drawable.main_card_trash_icon,getString(R.string.outer_nav1_menu3),getString(R.string.outer_nav1_menu3_des)));
+			list.add(new MenuItemEntity(R.drawable.main_card_memory_icon,getString(R.string.outer_nav1_menu4),getString(R.string.outer_nav1_menu4_des)));
 		}
 		if(type == MainActivity.NAVI_TYPE_2){
 			list.add(new MenuItemEntity(R.drawable.main_card_memory_icon,getString(R.string.outer_nav2_menu1),getString(R.string.outer_nav2_menu1_des)));

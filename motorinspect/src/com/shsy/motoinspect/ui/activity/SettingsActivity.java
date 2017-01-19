@@ -8,10 +8,13 @@ import com.shsy.motoinspect.ui.fragment.SettingServerFrm;
 import com.shsy.motoinspect.ui.fragment.OuterCheckFrm;
 import com.shsy.motoinspect.ui.fragment.OuterCheckItemsFrm;
 import com.shsy.motoinspect.ui.fragment.OuterItemFailReasonFrm;
+import com.shsy.motoinspect.ui.fragment.PullCarToLineFrm;
+import com.shsy.motoinspect.ui.fragment.RoadTestFrm;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motorinspect.R;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 
@@ -39,7 +42,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
 		
 		mExtra = getIntent().getIntExtra(CommonConstants.TO_SETTING, -1);
 		ft = getSupportFragmentManager().beginTransaction();
-		String title;
+		String title ="";
 		switch(mExtra){
 			case -1:
 				title = getResources().getString(R.string.login);
@@ -56,10 +59,19 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
 				break;
 				
 			case OuterCheckItemsFrm.ITEMFAIL:
-				title = "";
 				mTitleBarView.setTitle(title);
 				mTitleBarView.setBtnLeftOnclickListener(this);
 				ft.replace(R.id.fl_settings, OuterItemFailReasonFrm.instantiate(SettingsActivity.this, OuterItemFailReasonFrm.class.getName(),null),"OuterResultFrm");
+				break;
+			
+			case PullCarToLineFrm.TO_ROADTESTFRM:
+				title = getIntent().getExtras().getString(PullCarToLineFrm.ROADTEST_HPHM);
+				String jylsh = getIntent().getExtras().getString(PullCarToLineFrm.ROADTEST_JYLSH);
+				Bundle bundle = new Bundle();
+				bundle.putString(PullCarToLineFrm.ROADTEST_JYLSH, jylsh);
+				mTitleBarView.setTitle(title);
+				mTitleBarView.setBtnLeftOnclickListener(this);
+				ft.replace(R.id.fl_settings, RoadTestFrm.instantiate(SettingsActivity.this, RoadTestFrm.class.getName(),bundle),"RoadTestFrm");
 				break;
 			
 		}

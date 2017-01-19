@@ -9,7 +9,7 @@
     <string name="dynamic_check_car">底盘动态待检车辆</string>
     <string name="chassis_check_car">底盘部件待检车辆</string>
     <string name="workreset">复位工位</string>
-    <string name="sendback_cars">可退办车辆</string>
+    <string name="roadtest_pullcar">路试引车</string>
     <string name="reset">复位</string>
 
     <string name="checkpass">合格</string>
@@ -29,31 +29,50 @@
     <string name="ip">服务器IP</string>
     <string name="port">端口</string>
     <string name="save">保存</string>
+    <string name="search_vehicle_hphm">查找车辆</string>
     <string name="please_login">请登录</string>
+    <string name="please_input_hphm">请输入车辆号牌</string>
     <string name="not_connect_server">未连接服务器</string>
+    <string name="network_error">请检查网络</string>
     <string name="check_line_num">%1$s号检测线</string>
     <string name="select_photo_type">选择拍照项目</string>
     
     <string name="outer_nav1_menu1">外观查验</string>
     <string name="outer_nav1_menu2">底盘动态检查</string>
     <string name="outer_nav1_menu3">底盘部件检查</string>
+    <string name="outer_nav1_menu4">重新拍照或补拍</string>
     <string name="outer_nav2_menu1">引车上线</string>
     <string name="outer_nav2_menu2">工位复位</string>
-    <string name="outer_nav2_menu3">退办流水</string>
+    <string name="outer_nav2_menu3">路试引车</string>
     
     <string name="outer_nav1_menu1_des">车辆唯一性,车辆特征参数,车辆外观,安全装置,拍摄外观照片</string>
     <string name="outer_nav1_menu2_des">包含底盘动态检查</string>
     <string name="outer_nav1_menu3_des">包含底盘部件检查</string>
+    <string name="outer_nav1_menu4_des">外观照片重新拍照或补拍照片</string>
     <string name="outer_nav2_menu1_des">引车员引车上线</string>
     <string name="outer_nav2_menu2_des">终端上复位工位</string>
-    <string name="outer_nav2_menu3_des">退办上传平台流水</string>
+    <string name="outer_nav2_menu3_des">路试引车上线</string>
     
     <string name="veh_jcx">检测线</string>
     <string name="veh_sendback">退办</string>
-    <string name="is_confirm_sendback">是否确定%1$s退办</string>
+    <string name="is_confirm_roadtest">是否确定%1$s路试引车</string>
     <string name="is_confirm_pullcar">是否确定%1$s引车上线</string>
     <string name="is_confirm_reset">是否确定%1$s复位</string>
     <string name="reset_success">复位成功</string>
     <string name="positive">确定</string>
 	<string name="negative">取消</string>
+	
+	<string name="rephoto_hint">提示:输入号牌号码后4位字母或数字(不能输入汉字)</string>
+	<string name="rephoto_hint1">没有找到该号牌车辆</string>
+	<string name="rephoto_hint2">查找到的车辆(数量多时可以下拉)</string>
+	
+	
+	<string name="roadtest_brake_start">制动开始</string>
+	<string name="roadtest_brake_end">制动结束</string>
+	<string name="roadtest_autopark_start">驻车开始</string>
+	<string name="roadtest_autopark_end">驻车结束</string>
+	<string name="roadtest_velocity_start">速度开始</string>
+	<string name="roadtest_velocity_end">速度结束</string>
+	<string name="starttime">开始时间：</string>
+	<string name="endtime">结束时间：</string>
 </resources>
