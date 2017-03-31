@@ -20,7 +20,7 @@ public class TabAdapter extends FragmentPagerAdapter {
 	public static String[] CHASSISTITLES = new String[]
 			{ "底盘部件检查"};
 	public static String[] DYNAMICTITLES = new String[]
-			{ "底盘动态检验"};
+			{ "底盘动态检验","底盘动态拍照"};
 	public static String[] REPHOTOTITLES = new String[]
 			{ "重拍或补拍"};
 	public String[] TITLES;

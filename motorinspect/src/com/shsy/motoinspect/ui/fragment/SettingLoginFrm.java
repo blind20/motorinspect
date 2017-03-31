@@ -171,7 +171,7 @@ public class SettingLoginFrm extends BaseFragment {
 						
 						@Override
 						public void onError(Call call, Exception e, int id) {
-							ToastUtils.showToast(mActivity, "网络问题或密码错误", 0);
+							ToastUtils.showToast(mActivity, "网络问题", 0);
 							e.printStackTrace();
 						}
 					});

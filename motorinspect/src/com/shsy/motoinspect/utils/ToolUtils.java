@@ -425,39 +425,4 @@ public class ToolUtils {
 		return str;
 	}
 	
-	
-	
-	public static void alertDlg(Context con, String title, String msg){
-		new AlertDialog.Builder(con).setTitle(title)
-		.setMessage(msg).setPositiveButton("确定", null)
-		.create().show();
-	}
-	
-	
-	
-	
-	
-	/**
-	 * 取得“还剩下照片的list”
-	 * @param con
-	 * @param hasPhotoList 已经拍摄照片的list
-	 * @param fullPhotoList 所有类型照片的list
-	 * @return
-	 */
-	public static List<CarPhotoEntity> remainPhotoList(Context con,List<CarPhotoEntity> hasPhotoList
-			,List<CarPhotoEntity> fullPhotoList){
-		
-		List<CarPhotoEntity> copylist = new ArrayList<CarPhotoEntity>();
-		copylist = fullPhotoList;
-		for(int i=0 ;i<hasPhotoList.size();i++){
-			for(int j=0 ;j<copylist.size();j++){
-				if(hasPhotoList.get(i).getPhotoTypeCode().equals
-						(copylist.get(j).getPhotoTypeCode())){
-					copylist.remove(j);
-					break;
-				}
-			}
-		}
-		return copylist;
-	}
 }

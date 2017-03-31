@@ -40,6 +40,7 @@ import com.shsy.motoinspect.network.ListCarInfoCallback;
 import com.shsy.motoinspect.ui.fragment.MyDialogFragment;
 import com.shsy.motoinspect.ui.fragment.OuterCheckFrm;
 import com.shsy.motoinspect.ui.fragment.OuterPhotoFrm;
+import com.shsy.motoinspect.ui.fragment.OuterPhotoFrm2;
 import com.shsy.motoinspect.ui.fragment.OuterItemFailReasonFrm;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
@@ -49,10 +50,12 @@ import com.shsy.motoinspect.ui.fragment.OuterCheckItemsFrm;
 import com.shsy.motorinspect.R;
 import com.viewpagerindicator.TabPageIndicator;
 import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.builder.PostFormBuilder;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 public class OuterInspectActivity extends BaseActivity implements View.OnClickListener,
-OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
+OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener,
+OuterPhotoFrm2.OnChassisPhotoItemListener{
 
 	protected TitleBarView mTitleBarView;
 	
@@ -74,7 +77,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 	private BaseApplication app ;
 	private SparseArray<CheckItemEntity> sparseArray;
 	
-	private boolean mUploadSuccessFlag = true;
+	private boolean isUploadSuccess = true;
 	private ProgressDialog mProgressDlg ;
 	
 	
@@ -122,106 +125,26 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 		app = (BaseApplication) getApplication();
 		mOutCheckType = getIntent().getExtras().getInt(OuterCheckFrm.OUTCHECKTYPE);
 		
-		checkStart(mOutCheckType);
+		mProgressDlg = new ProgressDialog(this);
 		
 		Logger.show(getClass().getName(), "mOutCheckType:"+mOutCheckType);
 		sparseArray = new SparseArray<CheckItemEntity>();
 		
 		
 		carInfo = getCarInfoFromSel();
+		jylsh = carInfo.getLsh();
 //		mPohtos = initPhotos();
 		mPohtos = new ArrayList<CarPhotoEntity>();
-		
-		mFragments = initFragments(mOutCheckType);
 		
 		mTitleBarView.setTitle(carInfo.getHphm());
 		mTitleBarView.setBtnLeftOnclickListener(this);
 		mTitleBarView.setBtnRightOnclickListener(this);
+		
 		mManager = getSupportFragmentManager();
+		
+		mFragments = initFragments(mOutCheckType);
 		mAdapter = new TabAdapter(mManager,mFragments,mOutCheckType);
 		mViewPager.setAdapter(mAdapter);
-	}
-	
-	
-	
-	
-	private void checkStart(int checkType) {
-		if(checkType == CommonConstants.REPHOTO){
-			return;
-		}
-		String url = ToolUtils.getProcessStartUrl(this);
-		String jyxm = getCheckJyxm(mOutCheckType);
-		jylsh = getIntent().getStringExtra("jylsh");
-		String jycs = getIntent().getStringExtra("jycs");
-		showProgressDlg(mOutCheckType, "获取开始时间,检测开始");
-		checkStartNetWork(url,jylsh,jyxm,jycs);
-	}
-
-
-
-	private String getCheckJyxm(int type) {
-		String jyxm=null;
-		switch (type) {
-			case CommonConstants.APPEARANCE:
-				jyxm = "F1";
-				break;
-	
-			case CommonConstants.CHASSIS:
-				jyxm = "C1";
-				break;
-			case CommonConstants.DYNAMIC:
-				jyxm = "DC";
-				break;
-		}
-		return jyxm;
-	}
-	
-	
-	private void checkStartNetWork(String url,final String jylsh,String jyxm,String jycs) {
-		Map<String, String> headers = new HashMap<String, String>();
-		final String session = (String) SharedPreferenceUtils.get(OuterInspectActivity.this, CommonConstants.JSESSIONID, "");
-		if(TextUtils.isEmpty(session)){
-			return;
-		}
-		headers.put("Cookie", "JSESSIONID="+session);
-		
-		OkHttpUtils.post()
-		.url(url)
-		.headers(headers)
-		.addParams("jyxm", jyxm)
-		.addParams("jylsh", jylsh)
-		.addParams("jycs",jycs)
-		.build()
-		.execute(new StringCallback() {
-			
-			@Override
-			public void onResponse(String response, int id) {
-				try {
-					if(TextUtils.isEmpty(response)){
-						ToastUtils.showToast(OuterInspectActivity.this, "网络异常", Toast.LENGTH_LONG);
-						return;
-					}
-					JSONObject jo = new JSONObject(response);
-					Integer state = (Integer) jo.get("state");
-					if(CommonConstants.STATAS_OK == state){
-						ToastUtils.showToast(OuterInspectActivity.this, "检测开始", 
-								Toast.LENGTH_SHORT);
-					}
-					mProgressDlg.dismiss();
-				} catch (JSONException e) {
-					e.printStackTrace();
-					mProgressDlg.dismiss();
-				}
-				
-			}
-			
-			@Override
-			public void onError(Call call, Exception e, int id) {
-				ToastUtils.showToast(OuterInspectActivity.this, "请检查网络", 0);
-				mProgressDlg.dismiss();
-				e.printStackTrace();
-			}
-		});
 	}
 	
 	
@@ -287,6 +210,8 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 				
 				fms.add(new OuterCheckItemsFrm(dynamicList));
 				setValueToSpareArray(dynamicList);
+				
+				fms.add(new OuterPhotoFrm2(mPohtos));
 				break;
 			
 			case CommonConstants.REPHOTO:
@@ -373,19 +298,22 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 			uploadCheckItems(mOutCheckType);
 			uploadPhoto();
 			
-		}else if(mOutCheckType == CommonConstants.CHASSIS || 
-				mOutCheckType==CommonConstants.DYNAMIC){
+		}else if(mOutCheckType == CommonConstants.CHASSIS){
 			
 			uploadCheckItems(mOutCheckType);
 			
 		}else if(mOutCheckType == CommonConstants.REPHOTO){
+			uploadPhoto();
+			
+		}else if(mOutCheckType == CommonConstants.DYNAMIC){
+			uploadCheckItems(mOutCheckType);
 			uploadPhoto();
 		}
 	}
 
 
 	private void showProgressDlg(int mOutCheckType,String txt) {
-		mProgressDlg = new ProgressDialog(this);
+		
 		mProgressDlg.setMessage(txt);
 		mProgressDlg.show();
 	}
@@ -429,22 +357,22 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 			@Override
 			public void onResponse(String response, int id) {
 				
-				if(mUploadSuccessFlag && mOutCheckType != CommonConstants.APPEARANCE ){
-					OuterInspectActivity.this.finish();
-					mProgressDlg.dismiss();
-					showToast("检验项目上传成功");
-				}
-				//如果上传成功，并且是外观检测
-				else if(mUploadSuccessFlag && mOutCheckType == CommonConstants.APPEARANCE){
-					showToast("检验项目上传成功,等待照片上传");
-				}
+					if(mOutCheckType == CommonConstants.CHASSIS){
+						mProgressDlg.dismiss();
+						OuterInspectActivity.this.finish();
+						showToast("检验项目已上传");
+					}else if(CommonConstants.DYNAMIC == mOutCheckType || 
+							CommonConstants.APPEARANCE == mOutCheckType){
+						showToast("检验项目已上传");
+					}
+					
 			}
 			
 			@Override
 			public void onError(Call call, Exception e, int id) {
 				Logger.show(getClass().getName(), "onError "+e.toString());
 				showToast("检验项目上传失败,重新发送");
-				mUploadSuccessFlag = false;
+				isUploadSuccess = false;
 				mProgressDlg.dismiss();
 			}
 		});
@@ -456,6 +384,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 	 *
 	 */
 	private int mCount = 0;
+	
 	private void uploadPhoto() {
 		
 		final String url = ToolUtils.uploadPhotoUrl(OuterInspectActivity.this);
@@ -471,7 +400,15 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 		headers.put("Cookie", "JSESSIONID=" + session);
 		
 		final List<CarPhotoEntity> photos = mPohtos;
+		
+		//不上传照片的情况
+		if(photos==null || photos.size()==0){
+			OuterInspectActivity.this.finish();
+			return;
+		}
+		
 		for(int i = 0; i < photos.size(); i++) {
+			mCount = i;
 			File file = getPhotoFile(photos, i);
 			Map<String, String> params = putPhotoParams(photos, i);
 			
@@ -481,10 +418,9 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 				@Override
 				public void onResponse(String response, int id) {
 					Logger.show("photoresponse", "photoresponse="+response);
-					mCount++;
-					if (mCount == photos.size() && mUploadSuccessFlag) {
+					if (mCount == (photos.size()-1) && isUploadSuccess) {
 						OuterInspectActivity.this.finish();
-						showToast("照片上传成功");
+						showToast("检测照片已上传");
 						mProgressDlg.dismiss();
 					}
 				}
@@ -492,12 +428,14 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 				@Override
 				public void onError(Call call, Exception e, int id) {
 					e.printStackTrace();
-					mUploadSuccessFlag = false;
+					isUploadSuccess = false;
 					showToast("照片上传失败,重新上传");
 					mProgressDlg.dismiss();
 				}
 			});
 		}
+		
+		
 	}
 
 
@@ -529,7 +467,12 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 		map.put("jycs",Integer.toString(carInfo.getJycs()));
 		
 		map.put("pssj",ToolUtils.getCurDate() );
-		map.put("jyxm","F1");
+		
+		if(CommonConstants.DYNAMIC == mOutCheckType){
+			map.put("jyxm","DC");
+		}else{
+			map.put("jyxm","F1");
+		}
 		
 		map.put("zpzl",carPhoto.getPhotoTypeCode());
 		
@@ -546,21 +489,6 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 		map.put("hpzl",carInfo.getHpzl());
 		map.put("jyjgbh",carInfo.getJyjgbh());
 		map.put("jycs",Integer.toString(carInfo.getJycs()));
-//		map.put("jyxm","F1");
-		/*switch (mOutCheckType) {
-			case CommonConstants.APPEARANCE:
-				map.put("jyxm","F1");
-				break;
-	
-			case CommonConstants.CHASSIS:
-				map.put("jyxm","C1");
-				break;
-			
-			case CommonConstants.DYNAMIC:
-				map.put("jyxm","DC");
-				break;
-		}*/
-		
 		
 		for(int i=0;i<sparseArray.size();i++){
 			CheckItemEntity item = sparseArray.valueAt(i);
@@ -590,6 +518,13 @@ OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener{
 
 	@Override
 	public void OnAddPhotoItem(CarPhotoEntity carPhotoEntity) {
+		mPohtos.add(carPhotoEntity);
+	}
+
+
+
+	@Override
+	public void OnAddChassisPhotoItem(CarPhotoEntity carPhotoEntity) {
 		mPohtos.add(carPhotoEntity);
 	}
 

@@ -26,4 +26,17 @@ public class TakePhotoUtil {
 		}
 		return list;
 	}
+	
+	
+	public static List<CarPhotoEntity> initChassisPhotoList(Context con){
+		List<CarPhotoEntity> list = new ArrayList<CarPhotoEntity>();
+		String[] photoNames=con.getResources().getStringArray(R.array.chassis_photo);
+		String[] photoCodes=con.getResources().getStringArray(R.array.chassis_photo_code);
+		for(int i=0;i<photoNames.length;i++){
+			Bitmap bmp = BitmapFactory.decodeResource(con.getResources(), R.drawable.ic_photo_add);
+			CarPhotoEntity carPhoto = new CarPhotoEntity(photoCodes[i],photoNames[i],bmp,"","",OuterPhotoFrm.PHOTO_NOT_MUST);
+			list.add(carPhoto);
+		}
+		return list;
+	}
 }

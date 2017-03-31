@@ -1,8 +1,5 @@
 package com.shsy.motoinspect;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.shsy.motoinspect.network.CookieJarImpl;
@@ -11,9 +8,6 @@ import com.shsy.motorinspect.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import android.app.Application;
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 

@@ -183,4 +183,15 @@
      <item>0160</item>
      <item>0161</item>
   	</string-array>
+  	
+  	<string-array name="chassis_photo">
+        <item>动态检验开始</item>
+        <item>动态检验结束</item>
+    </string-array>
+    
+    <string-array name="chassis_photo_code">
+        <item>0344</item>
+        <item>0342</item>
+    </string-array>
+     
 </resources>

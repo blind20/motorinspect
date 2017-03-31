@@ -50,7 +50,7 @@ import okhttp3.Call;
 import android.widget.GridView;
 import android.widget.Toast;
 
-public class OuterPhotoFrm extends BaseFragment {
+public class OuterPhotoFrm2 extends BaseFragment {
 
 	private GridView mGridView;
 	private GridAdapter gridAdapter;
@@ -60,13 +60,9 @@ public class OuterPhotoFrm extends BaseFragment {
 	
 	private String timeStamp;
 	
-//	private String originPhotoFilePath;
-//	private String uploadPhotoFilePath;
-//	private String thumbnailPhotoFilePath;
 	
 	private Context context;
 	private int mPosition;
-	private String jylsh;
 	
 	//拍照原图
 	private final static int OriginType = 0;
@@ -83,41 +79,36 @@ public class OuterPhotoFrm extends BaseFragment {
 	
 	private int mWhich = -1;
 	
-	public static final String PHOTO_IS_MUST = "1";
-	public static final String PHOTO_NOT_MUST = "0";
-	private ProgressDialog mProgressDlg ;
-	private boolean isRePhoto=false;
 	
 	/**
 	 * 无参构造函数必须要,
 	 * 否则横屏重构报错
 	 * 
 	 */
-	public OuterPhotoFrm() {
+	public OuterPhotoFrm2() {
+		Logger.show("onCreate11", "onCreate11");
 		
 	}
 	
-	public OuterPhotoFrm(List<CarPhotoEntity> datas) {
+	public OuterPhotoFrm2(List<CarPhotoEntity> datas) {
 		mInitList = datas;
-		
 	}
 	
 	
-	protected OnPhotoItemListener mListener;
+	protected OnChassisPhotoItemListener mListener;
 	
-	public interface OnPhotoItemListener{
-		public void OnAddPhotoItem(CarPhotoEntity carPhotoEntity);
+	public interface OnChassisPhotoItemListener{
+		public void OnAddChassisPhotoItem(CarPhotoEntity carPhotoEntity);
 	}
 	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		isRePhoto = getArguments().getBoolean("isrephoto", false);
-		if(!isRePhoto){
-			jylsh = getArguments().getString("jylsh");
-
-		}
+		Logger.show("onCreate", "onCreate");
+		mInitList = new ArrayList<CarPhotoEntity>();
 	}
+	
 	
 	
 	@Override
@@ -138,7 +129,7 @@ public class OuterPhotoFrm extends BaseFragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			mListener = (OnPhotoItemListener) mActivity;
+			mListener = (OnChassisPhotoItemListener) mActivity;
 		} catch (ClassCastException e) {
 			e.printStackTrace();
 			throw new ClassCastException(mActivity.toString()
@@ -147,11 +138,6 @@ public class OuterPhotoFrm extends BaseFragment {
 	}
 
 
-	/**
-	 * activity创建后获得上
-	 * 下文,否则为空
-	 * 
-	 */
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -173,64 +159,16 @@ public class OuterPhotoFrm extends BaseFragment {
 	@Override
 	public void initParam() {
 		findView();
-		if(isRePhoto){
-			fullPhoto();
-		}else{
-			initViewsByJylsh();
-		}
+		initView();
 	}
 
-
-	private void initViewsByJylsh() {
-		
-		
-		String url = ToolUtils.getChekcItemUrl(mActivity);
-		Map<String, String> headers = new HashMap<String, String>();
-		final String session = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.JSESSIONID, "");
-		headers.put("Cookie", "JSESSIONID="+session);
-		
-		OkHttpUtils.post()
-		.url(url)
-		.headers(headers)
-		.addParams("jylsh", jylsh)
-		.addParams("type", CommonConstants.WGJYZP)
-		.build()
-		.execute(new StringCallback() {
-			
-			@Override
-			public void onResponse(String response, int id) {
-				try {
-					if(TextUtils.isEmpty(response)){
-						ToastUtils.showToast(mActivity, "无法获取指定检测照片,请检查车辆在检验监管平台是否登录成功", Toast.LENGTH_LONG);
-						mProgressDlg.dismiss();
-						fullPhoto();
-						return;
-					}
-					
-					String cyzp = response.toString();
-					String[] zps = cyzp.split(",");
-					
-					if(!TextUtils.isEmpty(cyzp)){
-						mInitList = markMustUpload(zps);
-						viewSetAdapter();
-					}else{
-						mProgressDlg.dismiss();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
-			@Override
-			public void onError(Call call, Exception e, int id) {
-				ToastUtils.showToast(mActivity, "服务器没有返回必须拍摄的照片类型", Toast.LENGTH_LONG);
-				fullPhoto();
-			}
-		});
+	
+	private void findView() {
+		mGridView = (GridView) mRootView.findViewById(R.id.grid_photo);
 	}
 	
-	
-	private void fullPhoto(){
+
+	private void initView(){
 		mInitList = initPhotoGrid();
 		viewSetAdapter();
 	}
@@ -242,31 +180,8 @@ public class OuterPhotoFrm extends BaseFragment {
 	}
 	
 	
-	
-	private List<CarPhotoEntity> markMustUpload(String[] cyzp) {
-		List<CarPhotoEntity> list = initPhotoGrid();
-		for(CarPhotoEntity carPhotoEntity : list){
-			String photoTypeCode = carPhotoEntity.getPhotoTypeCode();
-			for(String code: cyzp){
-				if(code.equals(photoTypeCode)){
-					carPhotoEntity.setIsMustFlag(OuterPhotoFrm.PHOTO_IS_MUST);
-					break;
-				}
-			}
-		}
-		return list;
-	}
-
-	private void findView() {
-		mGridView = (GridView) mRootView.findViewById(R.id.grid_photo);
-		mProgressDlg = new ProgressDialog(mActivity);
-		mProgressDlg.setMessage("加载平台指定拍摄的照片,请等待");
-		mProgressDlg.show();
-	}
-	
-	
 	private List<CarPhotoEntity> initPhotoGrid() {
-		List<CarPhotoEntity> list = TakePhotoUtil.initFullPhotoList(mActivity);
+		List<CarPhotoEntity> list = TakePhotoUtil.initChassisPhotoList(mActivity);
 		return list;
 	}
 	
@@ -277,7 +192,6 @@ public class OuterPhotoFrm extends BaseFragment {
 	 * 
 	 */
 	private void viewSetAdapter() {
-		mProgressDlg.dismiss();
 		gridAdapter = new GridAdapter(mActivity, mInitList, 0);
 		mGridView.setAdapter(gridAdapter);
 		
@@ -300,10 +214,6 @@ public class OuterPhotoFrm extends BaseFragment {
 					if(getSdcarState()){
 						timeStamp = getCurrentTimeStamp();
 						startCaptureAty(timeStamp);
-//						String txt = getResources().getString(R.string.select_photo_type);
-//						MyDialogFragment myDialog = MyDialogFragment.newInstance(MyDialogFragment.DLG_PHOTO_TYPE);
-//						myDialog.setTargetFragment(OuterPhotoFrm.this, OuterPhotoFrm.REQ_SELECT_PHOTO);
-//						myDialog.show(getFragmentManager(), txt);
 					}else{
 						ToastUtils.showToast(mActivity, getActivity().getString(R.string.sd_disable), Toast.LENGTH_LONG);
 					}
@@ -317,11 +227,11 @@ public class OuterPhotoFrm extends BaseFragment {
 	
 	private void startCaptureAty(String timeStamp) {
 		Intent photoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		String originPath = create3PhotoPathByType(timeStamp, OuterPhotoFrm.OriginType);
+		String originPath = create3PhotoPathByType(timeStamp, OuterPhotoFrm2.OriginType);
 		File photoFile = new File(originPath);
 		Uri fileUri = Uri.fromFile(photoFile);
 		photoIntent.putExtra(MediaStore.EXTRA_OUTPUT,fileUri);
-	    startActivityForResult(photoIntent, OuterPhotoFrm.REQ_CAMERA_DATA);
+	    startActivityForResult(photoIntent, OuterPhotoFrm2.REQ_CAMERA_DATA);
 	}
 	
 	
@@ -343,10 +253,10 @@ public class OuterPhotoFrm extends BaseFragment {
 	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-	    if( requestCode == OuterPhotoFrm.REQ_CAMERA_DATA ) {
+	    if( requestCode == OuterPhotoFrm2.REQ_CAMERA_DATA ) {
 	    	Logger.show("onActivityResult", "which"+mWhich);
 	    	
-	    	String[] pathArray = createUploadAndThumbnailFile(timeStamp, OuterPhotoFrm.UploadQuality);
+	    	String[] pathArray = createUploadAndThumbnailFile(timeStamp, OuterPhotoFrm2.UploadQuality);
 	    	//没有拍摄,直接返回
 	    	if(pathArray ==null){
 	    		return;
@@ -356,13 +266,13 @@ public class OuterPhotoFrm extends BaseFragment {
 	        carPhoto.setThumbnailBmp(BitmapFactory.decodeFile(pathArray[1]));
 	        carPhoto.setUploadPhotoFilePath(pathArray[0]);
 	        carPhoto.setThumbnailPhotoFilePath(pathArray[1]);
-	        mListener.OnAddPhotoItem(carPhoto);
+	        mListener.OnAddChassisPhotoItem(carPhoto);
 	        
 	        gridAdapter.setData(mInitList);
 	        gridAdapter.notifyDataSetChanged();
 	    }
 	    
-	    if(requestCode == OuterPhotoFrm.REQ_SELECT_PHOTO){
+	    if(requestCode == OuterPhotoFrm2.REQ_SELECT_PHOTO){
 	    	mWhich = data.getIntExtra(MyDialogFragment.RES_SELECT_PHOTO, -1);
 	    	timeStamp = getCurrentTimeStamp();
 			startCaptureAty(timeStamp);
@@ -384,9 +294,9 @@ public class OuterPhotoFrm extends BaseFragment {
 	 */
 	private String[] createUploadAndThumbnailFile(String timeStamp,int compressQuality) {
 		
-		String originFilepath = create3PhotoPathByType(timeStamp, OuterPhotoFrm.OriginType);
-		String uploadFilepath = create3PhotoPathByType(timeStamp, OuterPhotoFrm.UploadType);
-		String thumbnailFilepath = create3PhotoPathByType(timeStamp, OuterPhotoFrm.ThumbnaiType);
+		String originFilepath = create3PhotoPathByType(timeStamp, OuterPhotoFrm2.OriginType);
+		String uploadFilepath = create3PhotoPathByType(timeStamp, OuterPhotoFrm2.UploadType);
+		String thumbnailFilepath = create3PhotoPathByType(timeStamp, OuterPhotoFrm2.ThumbnaiType);
 		
 		Bitmap uploadBmp = compressBitmapByInsample(originFilepath, CommonConstants.OPTIONS_INSAMPLESIZE);
 		if(uploadBmp == null){
@@ -411,7 +321,7 @@ public class OuterPhotoFrm extends BaseFragment {
 			FileOutputStream thumbnailfos = new FileOutputStream(new File(thumbnailFilepath));
 			
 			uploadBmp.compress(Bitmap.CompressFormat.JPEG, compressQuality, uploadfos);
-			thumbnailBmp.compress(Bitmap.CompressFormat.JPEG, OuterPhotoFrm.ThumbnailQuality, thumbnailfos);
+			thumbnailBmp.compress(Bitmap.CompressFormat.JPEG, OuterPhotoFrm2.ThumbnailQuality, thumbnailfos);
 			uploadfos.flush();
 			thumbnailfos.flush();
 			uploadfos.close();
@@ -454,22 +364,6 @@ public class OuterPhotoFrm extends BaseFragment {
 	
 
 	/**
-	 * 不要硬编码(hardcode) /sdcard/; 使用 Environment.getExternalStorageDirectory().getPath() 替代sdcard路径
-	*以前的Android(4.1之前的版本)中，SDcard跟路径通过“/sdcard”或者“/mnt/sdcard”来表示，
-	*而在Jelly Bean系统中修改为了“/storage/sdcard0”，以后可能还会有多个SDcard的情况。
-	*目前为了保持和之前代码的兼容，sdcard路径做了link映射。
-	*为了使您的代码更加健壮并且能够兼容以后的Android版本和新的设备，
-	*请通过Environment.getExternalStorageDirectory().getPath()来获取sdcard路径，
-	*如果您需要往sdcard中保存特定类型的内容，可以考虑使用Environment.getExternalStoragePublicDirectory(String type)函数，
-	*该函数可以返回特定类型的目录，目前支持如下类型：
-	*DIRECTORY_DCIM //相机拍摄的图片和视频保存的位置
-	*DIRECTORY_DOWNLOADS //下载文件保存的位置
-	*DIRECTORY_MOVIES //电影保存的位置， 比如 通过google play下载的电影
-	*DIRECTORY_MUSIC //音乐保存的位置
-	*DIRECTORY_PICTURES //下载的图片保存的位置
-	*/	
-
-	/**
 	 * 根据时间戳得到原图、小图、图标三个路径
 	 * @param timeStamp
 	 */
@@ -478,13 +372,13 @@ public class OuterPhotoFrm extends BaseFragment {
 		String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
 		String fileName = "";
 		switch(type){
-			case OuterPhotoFrm.OriginType:
+			case OuterPhotoFrm2.OriginType:
 				fileName = "Origin_Veh_" + timeStamp + ".jpg";
 				break;
-			case OuterPhotoFrm.UploadType:
+			case OuterPhotoFrm2.UploadType:
 				fileName = "Small_Veh_" + timeStamp + ".jpg";
 				break;
-			case OuterPhotoFrm.ThumbnaiType:
+			case OuterPhotoFrm2.ThumbnaiType:
 				fileName = "Thumbnai_Veh_" + timeStamp + ".jpg";
 				break;
 		}

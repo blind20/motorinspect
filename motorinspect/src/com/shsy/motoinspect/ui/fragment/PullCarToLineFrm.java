@@ -8,6 +8,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.gson.JsonObject;
 import com.shsy.motoinspect.BaseFragment;
 import com.shsy.motoinspect.CommonConstants;
 import com.shsy.motoinspect.common.CommonAdapter;
@@ -19,6 +20,7 @@ import com.shsy.motoinspect.ui.activity.OuterInspectActivity;
 import com.shsy.motoinspect.ui.activity.SettingsActivity;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
+import com.shsy.motoinspect.utils.ToastUtils;
 import com.shsy.motoinspect.utils.ToolUtils;
 import com.shsy.motorinspect.R;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -38,6 +40,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 import okhttp3.Call;
 
 
@@ -57,6 +60,7 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 	private SwipeRefreshLayout mSwipeLayout;
 	public static final int REFRESH_COMPLETE = 0X110; 
 	public static final int REQ_CONFIRM_DLG =0x120;
+	public static final int REQ_PULLCAR_RECEIPT_DLG =0x120;
 	
 	public static final int TO_ROADTESTFRM = 0x100;
 	public static final String ROADTEST_HPHM ="hphm";
@@ -342,7 +346,16 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 					if(CommonConstants.STATAS_SUCCESS==state){
 						mCarList.remove(position);
 						adpter.notifyDataSetChanged();
-						return;
+					}else{
+						String message = jo.getString("message");
+//						ToastUtils.showToast(mActivity, message, Toast.LENGTH_LONG);
+						MyDialogFragment dialog = MyDialogFragment.newInstance(MyDialogFragment.DLG_CONFIRM, 
+																				mCarList.get(position).getHphm(),
+																				message,
+																				REQ_PULLCAR_RECEIPT_DLG);
+						
+						dialog.setTargetFragment(PullCarToLineFrm.this, REQ_PULLCAR_RECEIPT_DLG);
+						dialog.show(getFragmentManager(), "");
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -352,6 +365,7 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 			@Override
 			public void onError(Call call, Exception e, int id) {
 				Logger.show(getClass().getName(), "onItemClick onError " + e.getMessage());
+				ToastUtils.showToast(mActivity, "该车引车上线失败", Toast.LENGTH_LONG);
 				e.printStackTrace();
 			}
 		});

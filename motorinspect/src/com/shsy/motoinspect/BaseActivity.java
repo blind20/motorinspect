@@ -26,7 +26,7 @@ public abstract class BaseActivity extends FragmentActivity {
 		TAG = this.getClass().getSimpleName();
 		
 		
-//		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(getLayoutResID());
 		
@@ -34,11 +34,6 @@ public abstract class BaseActivity extends FragmentActivity {
 //		application = (BaseApplication) getApplication();
 //		sp = getSharedPreferences(CommonConstants.SP_NAME, MODE_PRIVATE);
 		
-		
-//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-//			getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);  
-//		    getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-//		}
 		findView();
 		initParam();
 	}

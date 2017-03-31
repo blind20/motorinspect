@@ -27,6 +27,7 @@ import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -61,6 +62,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 	
 	public static final String OUTCHECKTYPE ="OUTCHECKTYPE"; //put/get mOutCheckType值
 	private int mOutCheckType;
+	private ProgressDialog mProgressDlg;
 	
 	
 	 private Handler mHandler = new Handler(){  
@@ -68,7 +70,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 	        {  
 	            switch (msg.what)  
 	            {  
-		            case REFRESH_COMPLETE:  
+		            case REFRESH_COMPLETE: 
 		            	getCarListByCheckType(mOutCheckType);
 		            	if(!mCarList.isEmpty()){
 		            		adapter.notifyDataSetChanged();
@@ -135,6 +137,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 	@Override
 	public void onResume() {
 		super.onResume();
+		mProgressDlg.dismiss();
 		onRefresh();
 	}
 	
@@ -164,7 +167,6 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 		}
 		
 		mListView = (ListView) mRootView.findViewById(R.id.lv_carinspect);
-		
 		mSwipeLayout.setOnRefreshListener(this);
 		
 		mTitleBarView.setBtnLeftOnclickListener(new OnClickListener() {
@@ -173,6 +175,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 				mCallback.onOuterCheckBack();
 			}
 		});
+		mProgressDlg = new ProgressDialog(mActivity);
 	}
 
 	
@@ -219,10 +222,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 		Map<String, String> headers = new HashMap<String, String>();
 		String session = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.JSESSIONID, "");
 		if(TextUtils.isEmpty(session)){
-			Logger.show("getCarListNetwork", "sessionid = null");
 			return;
-		}else{
-			Logger.show("getCarListNetwork", "sessionid = "+session);
 		}
 		headers.put("Cookie", "JSESSIONID="+session);
 
@@ -281,20 +281,111 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				
-				
+				checkStart(mOutCheckType,position);
+			}
+		});
+	}
+	
+	
+	
+	private void checkStart(int checkType,int position) {
+		if(checkType == CommonConstants.REPHOTO){
+			return;
+		}
+//		ToastUtils.showToast(mActivity, "进入check",Toast.LENGTH_SHORT);
+		String url = ToolUtils.getProcessStartUrl(mActivity);
+		String jyxm = getCheckJyxm(mOutCheckType);
+		String jylsh = mCarList.get(position).getLsh();
+		String jycs = "1";
+		mProgressDlg.setMessage("获取检测开始时间");
+		mProgressDlg.show();
+		checkStartNetWork(url,jylsh,jyxm,jycs,position);
+	}
+	
+	private String getCheckJyxm(int type) {
+		String jyxm=null;
+		switch (type) {
+			case CommonConstants.APPEARANCE:
+				jyxm = "F1";
+				break;
+	
+			case CommonConstants.CHASSIS:
+				jyxm = "C1";
+				break;
+			case CommonConstants.DYNAMIC:
+				jyxm = "DC";
+				break;
+		}
+		return jyxm;
+	}
+	
+	//通知主控程序外检检测开始
+	private void checkStartNetWork(String url,final String jylsh,String jyxm,final String jycs,final int position) {
+		Map<String, String> headers = new HashMap<String, String>();
+		final String session = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.JSESSIONID, "");
+		if(TextUtils.isEmpty(session)){
+			return;
+		}
+		headers.put("Cookie", "JSESSIONID="+session);
+		
+		OkHttpUtils.post()
+		.url(url)
+		.headers(headers)
+		.addParams("jyxm", jyxm)
+		.addParams("jylsh", jylsh)
+		.addParams("jycs",jycs)
+		.build()
+		.execute(new StringCallback() {
+			
+			@Override
+			public void onResponse(String response, int id) {
+				try {
+					JSONObject jo = new JSONObject(response);
+					Integer state = (Integer) jo.get("state");
+					if(1 == state){
+						ToastUtils.showToast(mActivity, "检测开始",Toast.LENGTH_SHORT);
+						Intent intent = new Intent(mActivity, OuterInspectActivity.class);
+						Bundle bundle = new Bundle();
+						bundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, mCarList.get(position));
+						bundle.putInt(OUTCHECKTYPE, mOutCheckType);
+						bundle.putString("jylsh", jylsh);
+						bundle.putString("jycs", jycs);
+						intent.putExtras(bundle);
+						startActivity(intent);
+						return;
+					}else{
+						ToastUtils.showToast(mActivity, "获取不到检测开始时间", Toast.LENGTH_LONG);
+					}
+					
+					mProgressDlg.dismiss();
+				} catch (JSONException e) {
+					e.printStackTrace();
+					ToastUtils.showToast(mActivity, "数据格式异常", Toast.LENGTH_LONG);
+					mProgressDlg.dismiss();
+				}
+				/*
+				//-----------------单机评审版开始----------------------------------------------------------
 				Intent intent = new Intent(mActivity, OuterInspectActivity.class);
 				Bundle bundle = new Bundle();
 				bundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, mCarList.get(position));
 				bundle.putInt(OUTCHECKTYPE, mOutCheckType);
-				bundle.putString("jylsh", mCarList.get(position).getLsh());
-				bundle.putString("jycs", "1");
+				bundle.putString("jylsh", jylsh);
+				bundle.putString("jycs", jycs);
 				intent.putExtras(bundle);
 				startActivity(intent);
+				//------------------单机评审版结束-------------------------------------------------------
+				*/
 			}
 			
+			@Override
+			public void onError(Call call, Exception e, int id) {
+				ToastUtils.showToast(mActivity, "网络错误", Toast.LENGTH_LONG);
+				mProgressDlg.dismiss();
+				e.printStackTrace();
+			}
 		});
 	}
+	
 	
 	
 	private String convertCode(String hpzlCode) {
