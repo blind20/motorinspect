@@ -37,12 +37,14 @@ import com.shsy.motoinspect.entity.CarListInfoEntity;
 import com.shsy.motoinspect.entity.CarPhotoEntity;
 import com.shsy.motoinspect.entity.CheckItemEntity;
 import com.shsy.motoinspect.network.ListCarInfoCallback;
+import com.shsy.motoinspect.network.MyHttpUtils;
 import com.shsy.motoinspect.ui.fragment.MyDialogFragment;
 import com.shsy.motoinspect.ui.fragment.OuterCheckFrm;
 import com.shsy.motoinspect.ui.fragment.OuterPhotoFrm;
 import com.shsy.motoinspect.ui.fragment.OuterPhotoFrm2;
 import com.shsy.motoinspect.ui.fragment.OuterItemFailReasonFrm;
 import com.shsy.motoinspect.utils.Logger;
+import com.shsy.motoinspect.utils.ProgressDlgUtil;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
 import com.shsy.motoinspect.utils.ToastUtils;
 import com.shsy.motoinspect.utils.ToolUtils;
@@ -54,8 +56,7 @@ import com.zhy.http.okhttp.builder.PostFormBuilder;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 public class OuterInspectActivity extends BaseActivity implements View.OnClickListener,
-OuterCheckItemsFrm.OnClickCheckItemListener,OuterPhotoFrm.OnPhotoItemListener,
-OuterPhotoFrm2.OnChassisPhotoItemListener{
+OuterCheckItemsFrm.OnClickCheckItemListener{
 
 	protected TitleBarView mTitleBarView;
 	
@@ -69,7 +70,7 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 	private List<CheckItemEntity> mItemsCheckFail;
 	private CarListInfoEntity carInfo;
 	
-	private List<CarPhotoEntity> mPohtos;
+//	private List<CarPhotoEntity> mPohtos;
 	
 	private int mOutCheckType;
 	private String jylsh;
@@ -77,8 +78,6 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 	private BaseApplication app ;
 	private SparseArray<CheckItemEntity> sparseArray;
 	
-	private boolean isUploadSuccess = true;
-	private ProgressDialog mProgressDlg ;
 	
 	
 	
@@ -125,16 +124,11 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 		app = (BaseApplication) getApplication();
 		mOutCheckType = getIntent().getExtras().getInt(OuterCheckFrm.OUTCHECKTYPE);
 		
-		mProgressDlg = new ProgressDialog(this);
-		
-		Logger.show(getClass().getName(), "mOutCheckType:"+mOutCheckType);
 		sparseArray = new SparseArray<CheckItemEntity>();
-		
 		
 		carInfo = getCarInfoFromSel();
 		jylsh = carInfo.getLsh();
-//		mPohtos = initPhotos();
-		mPohtos = new ArrayList<CarPhotoEntity>();
+//		mPohtos = new ArrayList<CarPhotoEntity>();
 		
 		mTitleBarView.setTitle(carInfo.getHphm());
 		mTitleBarView.setBtnLeftOnclickListener(this);
@@ -170,6 +164,7 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 					list = initDatas(checkitems,start);
 					Bundle bundle = new Bundle();
 					bundle.putString("jylsh", jylsh);
+					bundle.putInt("type", type);
 					OuterCheckItemsFrm outerCheckItemsFrm = new OuterCheckItemsFrm(list);
 					outerCheckItemsFrm.setArguments(bundle);
 					fms.add(outerCheckItemsFrm);
@@ -179,7 +174,8 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 				//mPohtos引用取得拍摄的照片种类
 				Bundle bundle = new Bundle();
 				bundle.putString("jylsh", jylsh);
-				OuterPhotoFrm outerPhotoFrm = new OuterPhotoFrm(mPohtos);
+				bundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, carInfo);
+				OuterPhotoFrm outerPhotoFrm = new OuterPhotoFrm();
 				outerPhotoFrm.setArguments(bundle);
 				fms.add(outerPhotoFrm);
 				break;
@@ -191,6 +187,7 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 				
 				Bundle bundle2 = new Bundle();
 				bundle2.putString("jylsh", jylsh);
+				bundle2.putInt("type", type);
 				OuterCheckItemsFrm chassis = new OuterCheckItemsFrm(chassisList);
 				chassis.setArguments(bundle2);
 				
@@ -205,17 +202,21 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 				
 				Bundle bundle3 = new Bundle();
 				bundle3.putString("jylsh", jylsh);
+				bundle3.putInt("type", type);
 				OuterCheckItemsFrm dynamic = new OuterCheckItemsFrm(dynamicList);
 				dynamic.setArguments(bundle3);
-				
-				fms.add(new OuterCheckItemsFrm(dynamicList));
+				fms.add(dynamic);
 				setValueToSpareArray(dynamicList);
 				
-				fms.add(new OuterPhotoFrm2(mPohtos));
+				Bundle bundle4 = new Bundle();
+				bundle4.putParcelable("carInfo", carInfo);
+				OuterPhotoFrm2 outerPhotoFrm2 = new OuterPhotoFrm2();
+				outerPhotoFrm2.setArguments(bundle4);
+				fms.add(outerPhotoFrm2);
 				break;
 			
 			case CommonConstants.REPHOTO:
-				OuterPhotoFrm rePhoto = new OuterPhotoFrm(mPohtos);
+				OuterPhotoFrm rePhoto = new OuterPhotoFrm();
 				Bundle rePhotoBundle = new Bundle();
 				rePhotoBundle.putBoolean("isrephoto", true);
 				rePhoto.setArguments(rePhotoBundle);
@@ -235,20 +236,6 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 
 
 
-	/**
-	 *需要拍摄的照片有那几张mPohtos
-	 *初始的时候只有“添加图片”按钮
-	 *mPohtos被引用 fms.add(new OuterPhotoFrm(mPohtos))
-	 * @return
-	 */
-	private List<CarPhotoEntity> initPhotos() {
-		List<CarPhotoEntity> list = new ArrayList<CarPhotoEntity>();
-		Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_photo_add);
-        CarPhotoEntity addPhoto = new CarPhotoEntity("", "", bmp,"","",OuterPhotoFrm.PHOTO_NOT_MUST);
-		list.add(addPhoto);
-		return list;
-	}
-
 	
 	
 	/**
@@ -262,7 +249,7 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 			CheckItemEntity checkitem = new CheckItemEntity();
 			checkitem.setSeq(start+i);
 			checkitem.setTextCheckItem(items[i]);
-			checkitem.setCheckflag(1);
+			checkitem.setCheckflag(CommonConstants.NOTCHECK);
 			list.add(checkitem);
 		}
 		if(list.get(len-1).getSeq()==42){
@@ -283,8 +270,6 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 			break;
 			
 		case R.id.title_right:
-			String txt = "正在上传请等待...";
-			showProgressDlg(mOutCheckType,txt);
 			upload(mOutCheckType);
 			break;
 		}
@@ -294,28 +279,18 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 
 	private void upload(int mOutCheckType) {
 		if(CommonConstants.APPEARANCE == mOutCheckType){
-			
 			uploadCheckItems(mOutCheckType);
-			uploadPhoto();
 			
 		}else if(mOutCheckType == CommonConstants.CHASSIS){
 			
 			uploadCheckItems(mOutCheckType);
 			
 		}else if(mOutCheckType == CommonConstants.REPHOTO){
-			uploadPhoto();
+//			uploadPhoto();
 			
 		}else if(mOutCheckType == CommonConstants.DYNAMIC){
 			uploadCheckItems(mOutCheckType);
-			uploadPhoto();
 		}
-	}
-
-
-	private void showProgressDlg(int mOutCheckType,String txt) {
-		
-		mProgressDlg.setMessage(txt);
-		mProgressDlg.show();
 	}
 
 
@@ -342,142 +317,39 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 		if(TextUtils.isEmpty(url)){
 			return;
 		}
+		ProgressDlgUtil.showProgressDialog(this, "正在上传,请等待...");
 		
 		
-		Map<String, String> headers = new HashMap<String, String>();
-		String session = (String) SharedPreferenceUtils.get(this, CommonConstants.JSESSIONID, "");
-		if(TextUtils.isEmpty(session)){
-			return;
-		}
-		headers.put("Cookie", "JSESSIONID="+session);
-		OkHttpUtils.post()
-		.url(url).headers(headers)
-		.params(putCheckItemParams(type)).build().execute(new StringCallback() {
+		MyHttpUtils.getInstance(this).postHttpByParam(url, putCheckItemParams(type), new StringCallback(){
 			
 			@Override
 			public void onResponse(String response, int id) {
-				
-					if(mOutCheckType == CommonConstants.CHASSIS){
-						mProgressDlg.dismiss();
+				try {
+					JSONObject jo = new JSONObject(response);
+					Integer state = (Integer) jo.get("state");
+					if (CommonConstants.STATAS_SUCCESS == state) {
 						OuterInspectActivity.this.finish();
-						showToast("检验项目已上传");
-					}else if(CommonConstants.DYNAMIC == mOutCheckType || 
-							CommonConstants.APPEARANCE == mOutCheckType){
-						showToast("检验项目已上传");
+						ToastUtils.showToast(OuterInspectActivity.this, "上传成功", Toast.LENGTH_SHORT);
+					} else {
+						ToastUtils.showToast(OuterInspectActivity.this, "上传失败,请重新上传", Toast.LENGTH_SHORT);
 					}
-					
+					ProgressDlgUtil.dismissProgressDialog();
+				} catch (JSONException e) {
+					e.printStackTrace();
+					ToastUtils.showToast(OuterInspectActivity.this, "数据格式异常", Toast.LENGTH_SHORT);
+					ProgressDlgUtil.dismissProgressDialog();
+				}
 			}
 			
 			@Override
 			public void onError(Call call, Exception e, int id) {
-				Logger.show(getClass().getName(), "onError "+e.toString());
-				showToast("检验项目上传失败,重新发送");
-				isUploadSuccess = false;
-				mProgressDlg.dismiss();
+				ToastUtils.showToast(OuterInspectActivity.this, "网络问题,上传失败", Toast.LENGTH_SHORT);
+				ProgressDlgUtil.dismissProgressDialog();
 			}
 		});
 	}
 	
 
-	/**
-	 *上传照片
-	 *
-	 */
-	private int mCount = 0;
-	
-	private void uploadPhoto() {
-		
-		final String url = ToolUtils.uploadPhotoUrl(OuterInspectActivity.this);
-		String session = (String) SharedPreferenceUtils.get(this, CommonConstants.JSESSIONID, "");
-
-		if (TextUtils.isEmpty(url) || TextUtils.isEmpty(session)) {
-			return;
-		}
-		
-		final Map<String, String> headers = new HashMap<String, String>();
-		headers.put("APP-Key", "APP-Secret222");
-		headers.put("APP-Secret", "APP-Secret111");
-		headers.put("Cookie", "JSESSIONID=" + session);
-		
-		final List<CarPhotoEntity> photos = mPohtos;
-		
-		//不上传照片的情况
-		if(photos==null || photos.size()==0){
-			OuterInspectActivity.this.finish();
-			return;
-		}
-		
-		for(int i = 0; i < photos.size(); i++) {
-			mCount = i;
-			File file = getPhotoFile(photos, i);
-			Map<String, String> params = putPhotoParams(photos, i);
-			
-			OkHttpUtils.post().addFile("photo", "image"+i, file).url(url).headers(headers).params(params)
-			.build().execute(new StringCallback() {
-				
-				@Override
-				public void onResponse(String response, int id) {
-					Logger.show("photoresponse", "photoresponse="+response);
-					if (mCount == (photos.size()-1) && isUploadSuccess) {
-						OuterInspectActivity.this.finish();
-						showToast("检测照片已上传");
-						mProgressDlg.dismiss();
-					}
-				}
-
-				@Override
-				public void onError(Call call, Exception e, int id) {
-					e.printStackTrace();
-					isUploadSuccess = false;
-					showToast("照片上传失败,重新上传");
-					mProgressDlg.dismiss();
-				}
-			});
-		}
-		
-		
-	}
-
-
-
-
-	private File getPhotoFile(List<CarPhotoEntity> photos,int position){
-		CarPhotoEntity carPhoto = photos.get(position);
-		String filepath = carPhoto.getUploadPhotoFilePath();
-		
-		File file = new File(filepath);
-		Logger.show(getClass().getName(), "getPhotoFile"+filepath);
-		Logger.show(getClass().getName(), "filesize="+file.length());
-		return file;
-		
-	}
-	
-	private Map<String,String> putPhotoParams(List<CarPhotoEntity> photos,int position){
-		
-		CarPhotoEntity carPhoto = photos.get(position);
-		
-		Map<String,String> map = new HashMap<String,String>();
-		
-		map.put("jyjgbh",carInfo.getJyjgbh());
-		map.put("jcxdh",carInfo.getJcxdh());
-		map.put("jylsh", carInfo.getLsh());
-		map.put("hphm",carInfo.getHphm());
-		map.put("hpzl",carInfo.getHpzl());
-		map.put("clsbdh",carInfo.getClsbdh());
-		map.put("jycs",Integer.toString(carInfo.getJycs()));
-		
-		map.put("pssj",ToolUtils.getCurDate() );
-		
-		if(CommonConstants.DYNAMIC == mOutCheckType){
-			map.put("jyxm","DC");
-		}else{
-			map.put("jyxm","F1");
-		}
-		
-		map.put("zpzl",carPhoto.getPhotoTypeCode());
-		
-		return map;
-	}
 	
 	
 	private Map<String,String> putCheckItemParams(int mOutCheckType){
@@ -504,31 +376,12 @@ OuterPhotoFrm2.OnChassisPhotoItemListener{
 	}
 	
 
-	
-
-
 
 	@Override
 	public void onClickCheckItem(CheckItemEntity item) {
-		Logger.show(TAG, "********");
-		Logger.show(TAG, "item="+item.getSeq());
+		sparseArray.put(item.getSeq(), item);
 	}
 
 
-
-	@Override
-	public void OnAddPhotoItem(CarPhotoEntity carPhotoEntity) {
-		mPohtos.add(carPhotoEntity);
-	}
-
-
-
-	@Override
-	public void OnAddChassisPhotoItem(CarPhotoEntity carPhotoEntity) {
-		mPohtos.add(carPhotoEntity);
-	}
-
-
-	
 	
 }

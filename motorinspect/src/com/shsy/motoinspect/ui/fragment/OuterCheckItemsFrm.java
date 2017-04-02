@@ -1,16 +1,22 @@
 package com.shsy.motoinspect.ui.fragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.shsy.motoinspect.BaseFragment;
 import com.shsy.motoinspect.CommonConstants;
 import com.shsy.motoinspect.common.CommonAdapter;
 import com.shsy.motoinspect.common.ViewHolder;
 import com.shsy.motoinspect.entity.CheckItemEntity;
+import com.shsy.motoinspect.network.MyHttpUtils;
 import com.shsy.motoinspect.ui.activity.SettingsActivity;
 import com.shsy.motoinspect.utils.Logger;
+import com.shsy.motoinspect.utils.ToastUtils;
+import com.shsy.motoinspect.utils.ToolUtils;
 import com.shsy.motorinspect.R;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,9 +28,11 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import okhttp3.Call;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class OuterCheckItemsFrm extends BaseFragment {
 
@@ -45,6 +53,8 @@ public class OuterCheckItemsFrm extends BaseFragment {
 	
 	private ViewHolder mHolder;
 	private CheckItemEntity mEntity;
+	private String jylsh;
+	private int type;
 	
 	OnClickCheckItemListener mCallback;
 	public interface OnClickCheckItemListener{
@@ -55,18 +65,16 @@ public class OuterCheckItemsFrm extends BaseFragment {
 	
 	public OuterCheckItemsFrm(){}
 	
-	public OuterCheckItemsFrm(List<CheckItemEntity> datas,int start, int end) {
-		if(start < end){
-			this.mSubDatas = datas.subList(start, end);
-		}
-		
-	}
-	
 	public OuterCheckItemsFrm(List<CheckItemEntity> datas) {
 		mSubDatas = datas;
 	}
 	
-	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		jylsh = getArguments().getString("jylsh");
+		type = getArguments().getInt("type");
+	}
 	
 	
 	@Override
@@ -99,8 +107,11 @@ public class OuterCheckItemsFrm extends BaseFragment {
 	@Override
 	public void initParam() {
 		findView();
-		viewSetAdapter();
+		if(!TextUtils.isEmpty(jylsh)){
+			initViewByDefalut(mSubDatas,type);
+		}
 	}
+
 
 
 	@Override
@@ -113,10 +124,67 @@ public class OuterCheckItemsFrm extends BaseFragment {
 		mListView = (ListView) mRootView.findViewById(R.id.listview);
 		
 	}
+	
+
+	private void initViewByDefalut(final List<CheckItemEntity> list, final int type) {
+		String cytype = null;
+		switch (type) {
+			case CommonConstants.APPEARANCE:
+				cytype = CommonConstants.WGJYXM;
+				break;
+			case CommonConstants.DYNAMIC:
+				cytype = CommonConstants.DTDPJYXM;
+				break;
+			case CommonConstants.CHASSIS:
+				cytype = CommonConstants.DPJYXM;
+				break;
+		}
+		String url = ToolUtils.getChekcItemUrl(mActivity);
+		Map<String, String> param = new HashMap<String, String>();
+		param.put("jylsh", jylsh);
+		param.put("type", cytype);
+		MyHttpUtils.getInstance(mActivity).postHttpByParam(url, param, new StringCallback() {
+			@Override
+			public void onResponse(String response, int id) {
+				if(!TextUtils.isEmpty(response)){
+					String[] cyxm = response.split(",");
+					getDefaultCyxm(list,cyxm);
+				}
+				viewSetAdapter();
+			}
+			
+			@Override
+			public void onError(Call call, Exception e, int id) {
+				ToastUtils.showToast(mActivity, "网络问题,获取不到平台必检项目", Toast.LENGTH_LONG);
+				viewSetAdapter();
+				//测试开始======================================================
+				/*String response ="01,05,06,13,21,32,40,42,43,46,48,80";
+				if(!TextUtils.isEmpty(response)){
+					String[] cyxm = response.split(",");
+					getDefaultCyxm(list,cyxm);
+				}
+				viewSetAdapter();*/
+				//测试结束======================================================
+			}
+		});
+	}
+	
+	protected void getDefaultCyxm(List<CheckItemEntity> list, String[] cyxm) {
+		for(int i=0;i<list.size();i++){
+			int sequence = list.get(i).getSeq();
+			for(String seq:cyxm){
+				int index = Integer.parseInt(seq);
+				if(sequence == index){
+					list.get(i).setCheckflag(CommonConstants.CHECKPASS);
+					break;
+				}
+			}
+		}
+	}
 
 	private void viewSetAdapter() {
 		
-		adapter = new CommonAdapter<CheckItemEntity>(mSubDatas, getContext(), R.layout.item_outercheckitems_list) {
+		adapter = new CommonAdapter<CheckItemEntity>(mSubDatas,mActivity, R.layout.item_outercheckitems_list) {
 			@Override
 			public void convert( final ViewHolder holder, final CheckItemEntity entity) {
 				
@@ -184,8 +252,6 @@ public class OuterCheckItemsFrm extends BaseFragment {
 			mCallback.onClickCheckItem(mSubDatas.get(mPosition));
 		}else if(requestCode == OuterCheckItemsFrm.REQ_ITEMFAIL_REASON){
 			String txt = data.getStringExtra(OuterItemFailReasonFrm.ITEMFAIL_REASON);
-			Logger.show("onActivityResult", data.getStringExtra(OuterItemFailReasonFrm.ITEMFAIL_REASON));
-			Logger.show("onActivityResult", "pos ="+mHolder.getPosition());
 			if(TextUtils.isEmpty(txt)){
 				return;
 			}

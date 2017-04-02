@@ -34,7 +34,7 @@ public class MyDialogFragment extends DialogFragment {
 	public static final String REQUESTCODE = "requestCode";
 	
 	//对话框类型
-	public static final int DLG_PHOTO_TYPE = 0x12;
+	public static final int DLG_LIST_TYPE = 0x12;
 	public static final int DLG_CHECK = 0x10;
 	public static final int DLG_CONFIRM = 0x11;
 	
@@ -101,14 +101,18 @@ public class MyDialogFragment extends DialogFragment {
 				});
 				break;
 				
-			//拍照时,选择照片类型
-			case MyDialogFragment.DLG_PHOTO_TYPE:
-				builder.setTitle(getTag()).setAdapter(new ArrayAdapter<String>(getActivity(), 
-						android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.photoname)), 
+			//
+			case MyDialogFragment.DLG_LIST_TYPE:
+				builder.setAdapter(new ArrayAdapter<String>(getActivity(), 
+						android.R.layout.simple_list_item_1,  new String[]{"照片重新上传"}), 
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								setResultForSelectPhoto(which);
+								final int requestCode = getArguments().getInt(MyDialogFragment.REQUESTCODE);
+								if(getTargetFragment()!=null){
+									Intent intent = new Intent();
+									getTargetFragment().onActivityResult(requestCode,  Activity.RESULT_OK, intent);
+								}
 							}
 						} );
 				break;
@@ -154,11 +158,6 @@ public class MyDialogFragment extends DialogFragment {
 	}
 
 
-	private void setResultForSelectPhoto(int which){
-		Intent intent = new Intent();
-		intent.putExtra(MyDialogFragment.RES_SELECT_PHOTO, which);
-		getTargetFragment().onActivityResult(OuterPhotoFrm.REQ_SELECT_PHOTO, Activity.RESULT_OK, intent);
-	}
 	
 	
 	private void setResultForConfirmDlg(int requestCode,int resultCode,boolean isConfirm){

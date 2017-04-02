@@ -15,11 +15,14 @@ import org.json.JSONObject;
 import com.shsy.motoinspect.BaseFragment;
 import com.shsy.motoinspect.CommonConstants;
 import com.shsy.motoinspect.adapter.GridAdapter;
+import com.shsy.motoinspect.entity.CarListInfoEntity;
 import com.shsy.motoinspect.entity.CarPhotoEntity;
+import com.shsy.motoinspect.network.MyHttpUtils;
 import com.shsy.motoinspect.ui.activity.OuterInspectActivity;
 import com.shsy.motoinspect.utils.DensityUtil;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.PictureUtil;
+import com.shsy.motoinspect.utils.ProgressDlgUtil;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
 import com.shsy.motoinspect.utils.TakePhotoUtil;
 import com.shsy.motoinspect.utils.ToastUtils;
@@ -46,14 +49,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import okhttp3.Call;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class OuterPhotoFrm extends BaseFragment {
 
 	private GridView mGridView;
 	private GridAdapter gridAdapter;
+	private TextView tv_note;
+	private String sTxtNote;
 	
 	private List<CarPhotoEntity> mInitList;
 	private boolean isRecycle = false;
@@ -79,14 +86,14 @@ public class OuterPhotoFrm extends BaseFragment {
 	private final static int ThumbnailQuality =30;
 	
 	public static final int REQ_CAMERA_DATA = 100;
-	public static final int REQ_SELECT_PHOTO = 101;
+	public static final int REQ_LONG_CLICK = 101;
 	
 	private int mWhich = -1;
 	
 	public static final String PHOTO_IS_MUST = "1";
 	public static final String PHOTO_NOT_MUST = "0";
-	private ProgressDialog mProgressDlg ;
 	private boolean isRePhoto=false;
+	private CarListInfoEntity carInfo;
 	
 	/**
 	 * 无参构造函数必须要,
@@ -97,25 +104,16 @@ public class OuterPhotoFrm extends BaseFragment {
 		
 	}
 	
-	public OuterPhotoFrm(List<CarPhotoEntity> datas) {
-		mInitList = datas;
-		
-	}
-	
-	
-	protected OnPhotoItemListener mListener;
-	
-	public interface OnPhotoItemListener{
-		public void OnAddPhotoItem(CarPhotoEntity carPhotoEntity);
-	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		isRePhoto = getArguments().getBoolean("isrephoto", false);
+		mInitList = new ArrayList<CarPhotoEntity>();
+		sTxtNote = mActivity.getResources().getString(R.string.is_must_photo);
 		if(!isRePhoto){
 			jylsh = getArguments().getString("jylsh");
-
+			carInfo = getArguments().getParcelable(CommonConstants.BUNDLE_TO_OUTER);
 		}
 	}
 	
@@ -134,17 +132,7 @@ public class OuterPhotoFrm extends BaseFragment {
 	}
 	
 	
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			mListener = (OnPhotoItemListener) mActivity;
-		} catch (ClassCastException e) {
-			e.printStackTrace();
-			throw new ClassCastException(mActivity.toString()
-					+ " must implement OnHeadlineSelectedListener");
-		}
-	}
+	
 
 
 	/**
@@ -189,6 +177,7 @@ public class OuterPhotoFrm extends BaseFragment {
 		final String session = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.JSESSIONID, "");
 		headers.put("Cookie", "JSESSIONID="+session);
 		
+		ProgressDlgUtil.showProgressDialog(mActivity, "获取平台要求必检照片...");;
 		OkHttpUtils.post()
 		.url(url)
 		.headers(headers)
@@ -202,28 +191,26 @@ public class OuterPhotoFrm extends BaseFragment {
 				try {
 					if(TextUtils.isEmpty(response)){
 						ToastUtils.showToast(mActivity, "无法获取指定检测照片,请检查车辆在检验监管平台是否登录成功", Toast.LENGTH_LONG);
-						mProgressDlg.dismiss();
 						fullPhoto();
-						return;
-					}
-					
-					String cyzp = response.toString();
-					String[] zps = cyzp.split(",");
-					
-					if(!TextUtils.isEmpty(cyzp)){
-						mInitList = markMustUpload(zps);
-						viewSetAdapter();
 					}else{
-						mProgressDlg.dismiss();
+						String cyzp = response.toString();
+						String[] zps = cyzp.split(",");
+						if(!TextUtils.isEmpty(cyzp)){
+							mInitList = markMustUpload(zps);
+							viewSetAdapter();
+						}
 					}
+					ProgressDlgUtil.dismissProgressDialog();
 				} catch (Exception e) {
 					e.printStackTrace();
+					ProgressDlgUtil.dismissProgressDialog();
 				}
 			}
 			
 			@Override
 			public void onError(Call call, Exception e, int id) {
-				ToastUtils.showToast(mActivity, "服务器没有返回必须拍摄的照片类型", Toast.LENGTH_LONG);
+				ProgressDlgUtil.dismissProgressDialog();
+				ToastUtils.showToast(mActivity, "网络问题,获取不到平台必检照片", Toast.LENGTH_LONG);
 				fullPhoto();
 			}
 		});
@@ -259,9 +246,7 @@ public class OuterPhotoFrm extends BaseFragment {
 
 	private void findView() {
 		mGridView = (GridView) mRootView.findViewById(R.id.grid_photo);
-		mProgressDlg = new ProgressDialog(mActivity);
-		mProgressDlg.setMessage("加载平台指定拍摄的照片,请等待");
-		mProgressDlg.show();
+		tv_note = (TextView) mRootView.findViewById(R.id.tv_note);
 	}
 	
 	
@@ -277,14 +262,14 @@ public class OuterPhotoFrm extends BaseFragment {
 	 * 
 	 */
 	private void viewSetAdapter() {
-		mProgressDlg.dismiss();
 		gridAdapter = new GridAdapter(mActivity, mInitList, 0);
 		mGridView.setAdapter(gridAdapter);
-		
-		Logger.show("mInitList", mInitList.toString());
-		
+		onItemClick();
+		onItemLongClick();
+	}
+
+	private void onItemClick(){
 		mGridView.setOnItemClickListener(new OnItemClickListener(){
-		
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				
@@ -293,27 +278,36 @@ public class OuterPhotoFrm extends BaseFragment {
 				if(!TextUtils.isEmpty(mInitList.get(position).getUploadPhotoFilePath())){
 					//查看照片
 					viewImgHasPhoto(position);
-					
 				}else{
 					//拍摄照片
-					//判断SD卡状态
 					if(getSdcarState()){
+						sTxtNote = mActivity.getResources().getString(R.string.is_must_photo);
+						tv_note.setText(sTxtNote);
 						timeStamp = getCurrentTimeStamp();
 						startCaptureAty(timeStamp);
-//						String txt = getResources().getString(R.string.select_photo_type);
-//						MyDialogFragment myDialog = MyDialogFragment.newInstance(MyDialogFragment.DLG_PHOTO_TYPE);
-//						myDialog.setTargetFragment(OuterPhotoFrm.this, OuterPhotoFrm.REQ_SELECT_PHOTO);
-//						myDialog.show(getFragmentManager(), txt);
 					}else{
 						ToastUtils.showToast(mActivity, getActivity().getString(R.string.sd_disable), Toast.LENGTH_LONG);
 					}
 				}
-				
 			}
 		});
 	}
 	
-	
+	private void onItemLongClick() {
+		mGridView.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				mPosition = position;
+				MyDialogFragment myDialog = MyDialogFragment.newInstance(MyDialogFragment.DLG_LIST_TYPE,
+																			"","",
+																			OuterPhotoFrm.REQ_LONG_CLICK);
+				myDialog.setTargetFragment(OuterPhotoFrm.this, OuterPhotoFrm.REQ_LONG_CLICK);
+				myDialog.show(getFragmentManager(), "");
+				return false;
+			}
+		});
+	}
 	
 	private void startCaptureAty(String timeStamp) {
 		Intent photoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -344,7 +338,6 @@ public class OuterPhotoFrm extends BaseFragment {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    if( requestCode == OuterPhotoFrm.REQ_CAMERA_DATA ) {
-	    	Logger.show("onActivityResult", "which"+mWhich);
 	    	
 	    	String[] pathArray = createUploadAndThumbnailFile(timeStamp, OuterPhotoFrm.UploadQuality);
 	    	//没有拍摄,直接返回
@@ -356,20 +349,78 @@ public class OuterPhotoFrm extends BaseFragment {
 	        carPhoto.setThumbnailBmp(BitmapFactory.decodeFile(pathArray[1]));
 	        carPhoto.setUploadPhotoFilePath(pathArray[0]);
 	        carPhoto.setThumbnailPhotoFilePath(pathArray[1]);
-	        mListener.OnAddPhotoItem(carPhoto);
 	        
 	        gridAdapter.setData(mInitList);
 	        gridAdapter.notifyDataSetChanged();
+	        
+	        uploadPhoto(carPhoto,carInfo);
 	    }
 	    
-	    if(requestCode == OuterPhotoFrm.REQ_SELECT_PHOTO){
-	    	mWhich = data.getIntExtra(MyDialogFragment.RES_SELECT_PHOTO, -1);
-	    	timeStamp = getCurrentTimeStamp();
-			startCaptureAty(timeStamp);
+	    if(requestCode == OuterPhotoFrm.REQ_LONG_CLICK){
+	    	Logger.show("reupload", "====reupload=====");
+	    	CarPhotoEntity carPhoto = mInitList.get(mPosition);
+	        uploadPhoto(carPhoto,carInfo);
 	    }
 	}
 	
 	
+	
+	private void uploadPhoto(final CarPhotoEntity carPhoto,CarListInfoEntity carInfo) {
+		String url = ToolUtils.uploadPhotoUrl(mActivity);
+		Map<String, String> params = packZpInfoByArgu(carPhoto,carInfo);
+		File file = new File(carPhoto.getUploadPhotoFilePath());
+		ProgressDlgUtil.showProgressDialog(mActivity, "正在上传"+carPhoto.getPhotoTypeName()+"照片...");
+		MyHttpUtils.getInstance(mActivity)
+		.postHttpFile(url,file,params, new StringCallback() {
+			
+			@Override
+			public void onResponse(String response, int id) {
+				Logger.show("photoresponse", "photoresponse="+response);
+				try {
+					JSONObject jo = new JSONObject(response);
+					Integer state = (Integer) jo.get("state");
+					if(CommonConstants.STATAS_SUCCESS == state){
+						sTxtNote = carPhoto.getPhotoTypeName()+"照片上传成功";
+					}else{
+						sTxtNote = carPhoto.getPhotoTypeName()+"照片上传失败,请长按照片重新上传";
+					}
+					ProgressDlgUtil.dismissProgressDialog();
+					ToastUtils.showToast(mActivity, sTxtNote, Toast.LENGTH_SHORT);
+				} catch (JSONException e) {
+					e.printStackTrace();
+					ProgressDlgUtil.dismissProgressDialog();
+					sTxtNote = carPhoto.getPhotoTypeName()+"照片上传失败,请长按照片重新上传(数据格式异常)";
+					ToastUtils.showToast(mActivity, sTxtNote, Toast.LENGTH_LONG);
+				}
+				tv_note.setText(sTxtNote);
+			}
+
+			@Override
+			public void onError(Call call, Exception e, int id) {
+				ProgressDlgUtil.dismissProgressDialog();
+				e.printStackTrace();
+				sTxtNote = carPhoto.getPhotoTypeName()+"照片上传失败,请长按照片重新上传(网络问题)";
+				tv_note.setText(sTxtNote);
+				ToastUtils.showToast(mActivity, sTxtNote, Toast.LENGTH_LONG);
+			}
+		});
+	}
+	
+	
+	private Map<String, String> packZpInfoByArgu(CarPhotoEntity carPhoto,CarListInfoEntity carInfo){
+		Map<String,String> map = new HashMap<String,String>();
+		map.put("jyjgbh",carInfo.getJyjgbh());
+		map.put("jcxdh",carInfo.getJcxdh());
+		map.put("jylsh", carInfo.getLsh());
+		map.put("hphm",carInfo.getHphm());
+		map.put("hpzl",carInfo.getHpzl());
+		map.put("clsbdh",carInfo.getClsbdh());
+		map.put("jycs",Integer.toString(carInfo.getJycs()));
+		map.put("pssj",ToolUtils.getCurDate() );
+		map.put("jyxm","F1");
+		map.put("zpzl",carPhoto.getPhotoTypeCode());
+		return map;
+	}
 	
 
 	/**

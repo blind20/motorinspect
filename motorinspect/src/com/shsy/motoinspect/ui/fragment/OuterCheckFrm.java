@@ -343,7 +343,6 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 					JSONObject jo = new JSONObject(response);
 					Integer state = (Integer) jo.get("state");
 					if(1 == state){
-						ToastUtils.showToast(mActivity, "检测开始",Toast.LENGTH_SHORT);
 						Intent intent = new Intent(mActivity, OuterInspectActivity.class);
 						Bundle bundle = new Bundle();
 						bundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, mCarList.get(position));
@@ -363,7 +362,13 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 					ToastUtils.showToast(mActivity, "数据格式异常", Toast.LENGTH_LONG);
 					mProgressDlg.dismiss();
 				}
-				/*
+			}
+			
+			@Override
+			public void onError(Call call, Exception e, int id) {
+				ToastUtils.showToast(mActivity, "网络问题,请检查网络", Toast.LENGTH_LONG);
+				mProgressDlg.dismiss();
+				e.printStackTrace();
 				//-----------------单机评审版开始----------------------------------------------------------
 				Intent intent = new Intent(mActivity, OuterInspectActivity.class);
 				Bundle bundle = new Bundle();
@@ -374,14 +379,6 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 				intent.putExtras(bundle);
 				startActivity(intent);
 				//------------------单机评审版结束-------------------------------------------------------
-				*/
-			}
-			
-			@Override
-			public void onError(Call call, Exception e, int id) {
-				ToastUtils.showToast(mActivity, "网络错误", Toast.LENGTH_LONG);
-				mProgressDlg.dismiss();
-				e.printStackTrace();
 			}
 		});
 	}

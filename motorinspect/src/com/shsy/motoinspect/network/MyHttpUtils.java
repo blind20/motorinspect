@@ -1,57 +1,61 @@
 package com.shsy.motoinspect.network;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.shsy.motoinspect.CommonConstants;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
-import com.shsy.motoinspect.utils.ToastUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.builder.PostFormBuilder;
-import com.zhy.http.okhttp.callback.Callback;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.widget.Toast;
-import okhttp3.Call;
-import okhttp3.Response;
 
 public class MyHttpUtils {
 	
 	private static Context mContext;
-	private static String mUrl;
 	
 	
 	private static MyHttpUtils instance;
 	
-	private MyHttpUtils(Context context,String url){
+	private MyHttpUtils(Context context){
 		mContext = context;
-		mUrl = url;
 	}
 	
-	public static synchronized MyHttpUtils getInstance(Context context,String url) {
+	public static synchronized MyHttpUtils getInstance(Context context) {
 		if (instance == null) {
-			instance = new MyHttpUtils(context,url);
+			instance = new MyHttpUtils(context);
 		}
 		return instance;
 	}
 	
-	public static void postHttpParam(String[] keys,String[] values,StringCallback callback){
+	public void postHttpByParam(String url,Map<String, String> map,StringCallback callback){
 		Map<String, String> headers = new HashMap<String, String>();
 		String session = (String) SharedPreferenceUtils.get(mContext, CommonConstants.JSESSIONID, "");
 		if(TextUtils.isEmpty(session)){
 			return;
 		}
 		headers.put("Cookie", "JSESSIONID="+session);
-		
-		PostFormBuilder builder = OkHttpUtils.post().url(mUrl).headers(headers);
-		for(int i=0;i<keys.length;i++){
-			builder.addParams(keys[i], values[i]);
+		PostFormBuilder builder = OkHttpUtils.post().url(url).headers(headers);
+		for(Map.Entry<String, String> entry: map.entrySet()){
+			builder.addParams(entry.getKey(),entry.getValue());
 		}
-		
 		builder.build().execute(callback);
 	}
 
+	public void postHttpFile(String url,File file,Map<String, String> map,StringCallback callback){
+		String session = (String) SharedPreferenceUtils.get(mContext, CommonConstants.JSESSIONID, "");
+		if(TextUtils.isEmpty(session)){
+			return;
+		}
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("Cookie", "JSESSIONID="+session);
+		PostFormBuilder builder = OkHttpUtils.post().addFile("photo", "image", file).url(url).headers(headers);
+		for(Map.Entry<String, String> entry: map.entrySet()){
+			builder.addParams(entry.getKey(),entry.getValue());
+		}
+		builder.build().execute(callback);
+	}
 }
