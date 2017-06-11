@@ -108,12 +108,13 @@ public class OuterPhotoFrm extends BaseFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		isRePhoto = getArguments().getBoolean("isrephoto", false);
 		mInitList = new ArrayList<CarPhotoEntity>();
-		sTxtNote = mActivity.getResources().getString(R.string.is_must_photo);
+		
+		isRePhoto = getArguments().getBoolean("isrephoto", false);
+		carInfo = getArguments().getParcelable(CommonConstants.BUNDLE_TO_OUTER);
+		Logger.show("rephoto", "car="+carInfo.getJyjgbh());
 		if(!isRePhoto){
 			jylsh = getArguments().getString("jylsh");
-			carInfo = getArguments().getParcelable(CommonConstants.BUNDLE_TO_OUTER);
 		}
 	}
 	
@@ -247,6 +248,7 @@ public class OuterPhotoFrm extends BaseFragment {
 	private void findView() {
 		mGridView = (GridView) mRootView.findViewById(R.id.grid_photo);
 		tv_note = (TextView) mRootView.findViewById(R.id.tv_note);
+		sTxtNote = mActivity.getResources().getString(R.string.is_must_photo);
 	}
 	
 	
@@ -370,6 +372,7 @@ public class OuterPhotoFrm extends BaseFragment {
 		Map<String, String> params = packZpInfoByArgu(carPhoto,carInfo);
 		File file = new File(carPhoto.getUploadPhotoFilePath());
 		ProgressDlgUtil.showProgressDialog(mActivity, "正在上传"+carPhoto.getPhotoTypeName()+"照片...");
+		
 		MyHttpUtils.getInstance(mActivity)
 		.postHttpFile(url,file,params, new StringCallback() {
 			

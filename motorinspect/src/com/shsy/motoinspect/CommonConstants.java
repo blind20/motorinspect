@@ -50,12 +50,7 @@ public class CommonConstants {
 	public final static String BUNDLE_TO_OUTER = "outercheck";
 	
 	
-	//访问服务器
-	public final static String HOST = "http://192.168.0.108:8080/veh";
-	public final static String PULLCARSURL = HOST + "/pda/getCheckList";
-	public final static String PUSHCARONLINE = HOST + "/pda/pushVehOnLine";
-	public final static String LOGINURL = HOST + "/user/login";
-	public final static String OUTCARSURL = HOST + "/pda/getExternal";
+
 	
 	//个人设置页面跳转指定
 	public final static String TO_SETTING = "settingsel";
@@ -87,7 +82,14 @@ public class CommonConstants {
 	
 	//getChekcItem  请求参数 type
 	public final static String DTDPJYXM = "dtdpjyxm";
-	public final static String WGJYXM = "wgjyxm";
+	public final static String WGJYXM = "wgjcxm";
 	public final static String DPJYXM = "dpjyxm";
 	public final static String WGJYZP = "wgjyzp";
+	
+	
+	//选择三天内,一周内,两周内,一月内
+	public final static int DAYS3  = 3;
+	public final static int DAYS7 = 7;
+	public final static int DAYS14 = 14;
+	public final static int DAYS30 = 30;
 }

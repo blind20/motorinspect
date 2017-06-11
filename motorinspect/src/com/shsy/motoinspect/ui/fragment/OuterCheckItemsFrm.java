@@ -13,9 +13,12 @@ import com.shsy.motoinspect.entity.CheckItemEntity;
 import com.shsy.motoinspect.network.MyHttpUtils;
 import com.shsy.motoinspect.ui.activity.SettingsActivity;
 import com.shsy.motoinspect.utils.Logger;
+import com.shsy.motoinspect.utils.ProgressDlgUtil;
+import com.shsy.motoinspect.utils.SharedPreferenceUtils;
 import com.shsy.motoinspect.utils.ToastUtils;
 import com.shsy.motoinspect.utils.ToolUtils;
 import com.shsy.motorinspect.R;
+import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import android.app.Activity;
@@ -55,6 +58,7 @@ public class OuterCheckItemsFrm extends BaseFragment {
 	private CheckItemEntity mEntity;
 	private String jylsh;
 	private int type;
+	private String[] jcxmArray;
 	
 	OnClickCheckItemListener mCallback;
 	public interface OnClickCheckItemListener{
@@ -108,7 +112,7 @@ public class OuterCheckItemsFrm extends BaseFragment {
 	public void initParam() {
 		findView();
 		if(!TextUtils.isEmpty(jylsh)){
-			initViewByDefalut(mSubDatas,type);
+			viewSetAdapter();
 		}
 	}
 
@@ -125,62 +129,20 @@ public class OuterCheckItemsFrm extends BaseFragment {
 		
 	}
 	
-
-	private void initViewByDefalut(final List<CheckItemEntity> list, final int type) {
-		String cytype = null;
-		switch (type) {
-			case CommonConstants.APPEARANCE:
-				cytype = CommonConstants.WGJYXM;
-				break;
-			case CommonConstants.DYNAMIC:
-				cytype = CommonConstants.DTDPJYXM;
-				break;
-			case CommonConstants.CHASSIS:
-				cytype = CommonConstants.DPJYXM;
-				break;
-		}
-		String url = ToolUtils.getChekcItemUrl(mActivity);
-		Map<String, String> param = new HashMap<String, String>();
-		param.put("jylsh", jylsh);
-		param.put("type", cytype);
-		MyHttpUtils.getInstance(mActivity).postHttpByParam(url, param, new StringCallback() {
-			@Override
-			public void onResponse(String response, int id) {
-				if(!TextUtils.isEmpty(response)){
-					String[] cyxm = response.split(",");
-					getDefaultCyxm(list,cyxm);
-				}
-				viewSetAdapter();
-			}
-			
-			@Override
-			public void onError(Call call, Exception e, int id) {
-				ToastUtils.showToast(mActivity, "网络问题,获取不到平台必检项目", Toast.LENGTH_LONG);
-				viewSetAdapter();
-				//测试开始======================================================
-				/*String response ="01,05,06,13,21,32,40,42,43,46,48,80";
-				if(!TextUtils.isEmpty(response)){
-					String[] cyxm = response.split(",");
-					getDefaultCyxm(list,cyxm);
-				}
-				viewSetAdapter();*/
-				//测试结束======================================================
-			}
-		});
-	}
-	
-	protected void getDefaultCyxm(List<CheckItemEntity> list, String[] cyxm) {
-		for(int i=0;i<list.size();i++){
-			int sequence = list.get(i).getSeq();
-			for(String seq:cyxm){
-				int index = Integer.parseInt(seq);
-				if(sequence == index){
-					list.get(i).setCheckflag(CommonConstants.CHECKPASS);
-					break;
+	/*protected void getDefaultCyxm(List<CheckItemEntity> list, String[] cyxm) {
+		if(cyxm!=null &&cyxm.length>0){
+			for(int i=0;i<list.size();i++){
+				int sequence = list.get(i).getSeq();
+				for(String seq:cyxm){
+					int index = Integer.parseInt(seq);
+					if(sequence == index){
+						list.get(i).setCheckflag(CommonConstants.CHECKPASS);
+						break;
+					}
 				}
 			}
 		}
-	}
+	}*/
 
 	private void viewSetAdapter() {
 		

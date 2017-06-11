@@ -77,7 +77,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 	
 	private BaseApplication app ;
 	private SparseArray<CheckItemEntity> sparseArray;
-	
+	private String[] jcxmArray;
 	
 	
 	
@@ -122,13 +122,11 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 	@Override
 	public void initParam() {
 		app = (BaseApplication) getApplication();
-		mOutCheckType = getIntent().getExtras().getInt(OuterCheckFrm.OUTCHECKTYPE);
-		
 		sparseArray = new SparseArray<CheckItemEntity>();
 		
-		carInfo = getCarInfoFromSel();
-		jylsh = carInfo.getLsh();
-//		mPohtos = new ArrayList<CarPhotoEntity>();
+		getArgumentByIntent();
+		
+//		mPohtos = new ArrayList<CarPhotoEntity>();;
 		
 		mTitleBarView.setTitle(carInfo.getHphm());
 		mTitleBarView.setBtnLeftOnclickListener(this);
@@ -143,9 +141,17 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 	
 	
 
-	private CarListInfoEntity getCarInfoFromSel() {
-		return getIntent().getExtras().getParcelable(CommonConstants.BUNDLE_TO_OUTER);
+	private void getArgumentByIntent() {
+		mOutCheckType = getIntent().getExtras().getInt(OuterCheckFrm.OUTCHECKTYPE);
+		carInfo = getIntent().getExtras().getParcelable(CommonConstants.BUNDLE_TO_OUTER);
+		jylsh = carInfo.getLsh();
+		jcxmArray = getIntent().getExtras().getStringArray("jcxms");
+		if(jcxmArray == null){
+			Logger.show("getArgumentByIntent", "getArgumentByIntent");
+		}
+		
 	}
+
 
 
 	
@@ -161,10 +167,13 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 					List<CheckItemEntity> list = new ArrayList<CheckItemEntity>();
 					start += len ;
 					String[] checkitems = app.initOuterCheckItems(i);
-					list = initDatas(checkitems,start);
+					list = initDatas(checkitems,start,jcxmArray);
+//					list = initDatas(checkitems,start);
+					
 					Bundle bundle = new Bundle();
 					bundle.putString("jylsh", jylsh);
 					bundle.putInt("type", type);
+//					bundle.putStringArray("jcxms", jcxmArray);
 					OuterCheckItemsFrm outerCheckItemsFrm = new OuterCheckItemsFrm(list);
 					outerCheckItemsFrm.setArguments(bundle);
 					fms.add(outerCheckItemsFrm);
@@ -183,11 +192,13 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 			case CommonConstants.CHASSIS:
 				List<CheckItemEntity> chassisList = new ArrayList<CheckItemEntity>();
 				String[] chassisItems = app.initOuterCheckItems(7);
-				chassisList = initDatas(chassisItems,46);
+				chassisList = initDatas(chassisItems,46,jcxmArray);
+//				chassisList = initDatas(chassisItems,46);
 				
 				Bundle bundle2 = new Bundle();
 				bundle2.putString("jylsh", jylsh);
 				bundle2.putInt("type", type);
+//				bundle2.putStringArray("jcxms", jcxmArray);
 				OuterCheckItemsFrm chassis = new OuterCheckItemsFrm(chassisList);
 				chassis.setArguments(bundle2);
 				
@@ -198,11 +209,13 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 			case CommonConstants.DYNAMIC:
 				List<CheckItemEntity> dynamicList = new ArrayList<CheckItemEntity>();
 				String[] dynamicLtems = app.initOuterCheckItems(6);
-				dynamicList = initDatas(dynamicLtems,42);
+				dynamicList = initDatas(dynamicLtems,42,jcxmArray);
+//				dynamicList = initDatas(dynamicLtems,42);
 				
 				Bundle bundle3 = new Bundle();
 				bundle3.putString("jylsh", jylsh);
 				bundle3.putInt("type", type);
+//				bundle3.putStringArray("jcxms", jcxmArray);
 				OuterCheckItemsFrm dynamic = new OuterCheckItemsFrm(dynamicList);
 				dynamic.setArguments(bundle3);
 				fms.add(dynamic);
@@ -216,9 +229,12 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 				break;
 			
 			case CommonConstants.REPHOTO:
-				OuterPhotoFrm rePhoto = new OuterPhotoFrm();
+				CarListInfoEntity carinfo = getIntent().getParcelableExtra(CommonConstants.BUNDLE_TO_OUTER);
 				Bundle rePhotoBundle = new Bundle();
 				rePhotoBundle.putBoolean("isrephoto", true);
+				rePhotoBundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, carinfo);
+				
+				OuterPhotoFrm rePhoto = new OuterPhotoFrm();
 				rePhoto.setArguments(rePhotoBundle);
 				fms.add(rePhoto);;
 				break;
@@ -242,7 +258,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 	 * 根据类型初始化查验项目
 	 * @return
 	 */
-	private List<CheckItemEntity> initDatas(String[] items,int start) {
+	private List<CheckItemEntity> initDatas(String[] items,int start,String[]jcxms) {
 		List<CheckItemEntity> list = new ArrayList<CheckItemEntity>();
 		int len = items.length ;
 		for(int i=0; i<len; i++){
@@ -254,6 +270,17 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 		}
 		if(list.get(len-1).getSeq()==42){
 			list.get(len-1).setSeq(80);
+		}
+		if(jcxms!=null && jcxms.length>0){
+			for(int i=0;i<list.size();i++){
+				for(int j=0;j<jcxms.length;j++){
+					int index = Integer.parseInt(jcxms[j]);
+					if(list.get(i).getSeq()==index){
+						list.get(i).setCheckflag(CommonConstants.CHECKPASS);
+						break;
+					}
+				}
+			}
 		}
 		return list;
 	}
@@ -278,17 +305,9 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 	
 
 	private void upload(int mOutCheckType) {
-		if(CommonConstants.APPEARANCE == mOutCheckType){
-			uploadCheckItems(mOutCheckType);
-			
-		}else if(mOutCheckType == CommonConstants.CHASSIS){
-			
-			uploadCheckItems(mOutCheckType);
-			
-		}else if(mOutCheckType == CommonConstants.REPHOTO){
-//			uploadPhoto();
-			
-		}else if(mOutCheckType == CommonConstants.DYNAMIC){
+		if(mOutCheckType == CommonConstants.REPHOTO){
+			finish();
+		}else{
 			uploadCheckItems(mOutCheckType);
 		}
 	}
@@ -317,8 +336,10 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 		if(TextUtils.isEmpty(url)){
 			return;
 		}
-		ProgressDlgUtil.showProgressDialog(this, "正在上传,请等待...");
 		
+		
+		
+		ProgressDlgUtil.showProgressDialog(this, "正在上传,请等待...");
 		
 		MyHttpUtils.getInstance(this).postHttpByParam(url, putCheckItemParams(type), new StringCallback(){
 			

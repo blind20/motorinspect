@@ -15,9 +15,12 @@ import com.shsy.motoinspect.common.TitleBarView;
 import com.shsy.motoinspect.common.ViewHolder;
 import com.shsy.motoinspect.entity.CarListInfoEntity;
 import com.shsy.motoinspect.entity.CarPhotoEntity;
+import com.shsy.motoinspect.entity.CheckItemEntity;
 import com.shsy.motoinspect.network.ListCarInfoCallback;
+import com.shsy.motoinspect.network.MyHttpUtils;
 import com.shsy.motoinspect.ui.activity.MainActivity;
 import com.shsy.motoinspect.ui.activity.OuterInspectActivity;
+import com.shsy.motoinspect.utils.DateUtils;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
 import com.shsy.motoinspect.utils.ToastUtils;
@@ -29,6 +32,8 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -38,9 +43,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 import okhttp3.Call;
 import okhttp3.Request;
@@ -63,6 +71,10 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 	public static final String OUTCHECKTYPE ="OUTCHECKTYPE"; //put/get mOutCheckType值
 	private int mOutCheckType;
 	private ProgressDialog mProgressDlg;
+	private String[] mPeriods = {"三天内", "一周内", "两周内", "一月内"};
+	private List<CarListInfoEntity> mTotalList;
+	private String[] jcxmArray;
+	
 	
 	
 	 private Handler mHandler = new Handler(){  
@@ -76,6 +88,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 		            		adapter.notifyDataSetChanged();
 		            	}
 		                mSwipeLayout.setRefreshing(false);  
+		                mTitleBarView.getTitleRight().setText(mPeriods[0]);
 		                break;  
 		                
 	            }  
@@ -149,7 +162,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 		mSwipeLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.id_swipe_ly);
 		mTitleBarView = new TitleBarView(mActivity);
 		mTitleBarView = (TitleBarView) mRootView.findViewById(R.id.titlebar);
-		mTitleBarView.setCommonTitle(View.VISIBLE, View.VISIBLE, View.GONE);
+		mTitleBarView.setCommonTitle(View.VISIBLE, View.VISIBLE, View.VISIBLE);
 		
 		
 		switch (mOutCheckType) {
@@ -175,13 +188,66 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 				mCallback.onOuterCheckBack();
 			}
 		});
+		mTitleBarView.getTitleRight().setText(mPeriods[0]);
+		mTitleBarView.setBtnRightOnclickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onPopupWindow();
+			}
+		});
 		mProgressDlg = new ProgressDialog(mActivity);
 	}
+	
+	
 
-	
-	
+	protected void onPopupWindow() {
+		View popupView = mActivity.getLayoutInflater().inflate(R.layout.popupwindow, null);
+		ListView lvPeriod = (ListView) popupView.findViewById(R.id.lv_period);
+		lvPeriod.setAdapter(new ArrayAdapter<String>(mActivity, android.R.layout.simple_list_item_1, mPeriods));
+		final PopupWindow window = new PopupWindow(popupView,300, LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F8F8F8")));
+        window.setFocusable(true);
+        window.setOutsideTouchable(true);
+        window.update();
+        window.showAsDropDown(mTitleBarView.getTitleRight(), 0, 5);
+        
+        lvPeriod.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				int period = CommonConstants.DAYS3;
+				switch (position) {
+				case 0:
+					period =CommonConstants.DAYS3;;
+					mTitleBarView.getTitleRight().setText(mPeriods[0]);
+					break;
+				case 1:
+					period =CommonConstants.DAYS7;
+					mTitleBarView.getTitleRight().setText(mPeriods[1]);
+					break;
+				case 2:
+					period =CommonConstants.DAYS14;
+					mTitleBarView.getTitleRight().setText(mPeriods[2]);
+					break;
+				case 3:
+					period =CommonConstants.DAYS30;
+					mTitleBarView.getTitleRight().setText(mPeriods[3]);
+					break;
+				}
+				mCarList = getListByPeriod(mTotalList, period);
+//				ToastUtils.showToast(mActivity, "size="+mCarList.size(), Toast.LENGTH_LONG);
+				if(mCarList.size()!=0){
+					adapter.setDatas(mCarList);
+					adapter.notifyDataSetChanged();
+				}
+				window.dismiss();
+			}
+		});
+	}
+
 	private void initDatas() {
 		mCarList = new ArrayList<CarListInfoEntity>();
+		mTotalList = new ArrayList<CarListInfoEntity>();
+		jcxmArray = new String[]{};
 		
 		//测试代码
 //		mCarList.add(new CarListInfoEntity("苏C2868J", "小型汽车", "2016050123985890", "2016-03-02",CommonConstants.NOTPULLCAR
@@ -232,15 +298,15 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 			@Override
 			public void onError(Call call, Exception e, int id) {
 				ToastUtils.showToast(mActivity, mActivity.getString(R.string.not_connect_server), Toast.LENGTH_LONG);
-				Logger.show(getTag(), e.getMessage());
+//				Logger.show(getTag(), e.getMessage());
 				e.printStackTrace();
 			}
 
 			@Override
 			public void onResponse(List<CarListInfoEntity> list, int id) {
-				
+				mTotalList = list;
 				mCarList.clear();
-				mCarList.addAll(list);
+				mCarList.addAll(getListByPeriod(mTotalList, CommonConstants.DAYS3));
 				viewSetAdapter();
 			}
 			
@@ -319,7 +385,16 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 		return jyxm;
 	}
 	
-	//通知主控程序外检检测开始
+	
+	
+	/**
+	 * 通知服务器“检测开始”
+	 * @param url
+	 * @param jylsh
+	 * @param jyxm
+	 * @param jycs
+	 * @param position
+	 */
 	private void checkStartNetWork(String url,final String jylsh,String jyxm,final String jycs,final int position) {
 		Map<String, String> headers = new HashMap<String, String>();
 		final String session = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.JSESSIONID, "");
@@ -343,45 +418,111 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 					JSONObject jo = new JSONObject(response);
 					Integer state = (Integer) jo.get("state");
 					if(1 == state){
-						Intent intent = new Intent(mActivity, OuterInspectActivity.class);
-						Bundle bundle = new Bundle();
-						bundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, mCarList.get(position));
-						bundle.putInt(OUTCHECKTYPE, mOutCheckType);
-						bundle.putString("jylsh", jylsh);
-						bundle.putString("jycs", jycs);
-						intent.putExtras(bundle);
-						startActivity(intent);
-						return;
+						getDefalutJcxmByNetwork(jylsh,mOutCheckType,jycs, position);
 					}else{
+						
 						ToastUtils.showToast(mActivity, "获取不到检测开始时间", Toast.LENGTH_LONG);
 					}
 					
-					mProgressDlg.dismiss();
 				} catch (JSONException e) {
 					e.printStackTrace();
 					ToastUtils.showToast(mActivity, "数据格式异常", Toast.LENGTH_LONG);
-					mProgressDlg.dismiss();
+				}
+				mProgressDlg.dismiss();
+			}
+
+			
+			@Override
+			public void onError(Call call, Exception e, int id) {
+//				ToastUtils.showToast(mActivity, "网络问题,请检查网络", Toast.LENGTH_LONG);
+				//=========测试开始test start=======
+//				getDefalutJcxmByNetwork(jylsh,mOutCheckType,jycs, position);
+				
+				//=========测试结束test end==========
+				Logger.show(TAG, "checkStartNetWork onError");
+				mProgressDlg.dismiss();
+				e.printStackTrace();
+			}
+		});
+	}
+	
+
+	
+	
+	/**
+	 * 
+	 * 获取平台默认外观检测项目
+	 * @param jylsh
+	 * @param type
+	 */
+	private void getDefalutJcxmByNetwork(final String jylsh, final int type, final String jycs, final int position) {
+		String sytype = null;
+		switch (type) {
+			case CommonConstants.APPEARANCE:
+				sytype = CommonConstants.WGJYXM;
+				break;
+			case CommonConstants.DYNAMIC:
+				sytype = CommonConstants.DTDPJYXM;
+				break;
+			case CommonConstants.CHASSIS:
+				sytype = CommonConstants.DPJYXM;
+				break;
+		}
+		String url = ToolUtils.getChekcItemUrl(mActivity);
+		final Map<String, String> param = new HashMap<String, String>();
+		param.put("jylsh", jylsh);
+		param.put("type", sytype);
+		
+		MyHttpUtils.getInstance(mActivity).postHttpByParam(url, param, new StringCallback() {
+			@Override
+			public void onResponse(String response, int id) {
+//				ToastUtils.showToast(mActivity, "response="+response, Toast.LENGTH_LONG);
+				if(!TextUtils.isEmpty(response)){
+					jcxmArray = response.split(",");
+					startInspectAty(jylsh,jycs,position,jcxmArray);
+				}else{
+					Logger.show(TAG, "getDefalutJcxmByNetwork onResponse2");
+					startInspectAty(jylsh,jycs,position,null);
 				}
 			}
 			
 			@Override
 			public void onError(Call call, Exception e, int id) {
-				ToastUtils.showToast(mActivity, "网络问题,请检查网络", Toast.LENGTH_LONG);
-				mProgressDlg.dismiss();
-				e.printStackTrace();
-				//-----------------单机评审版开始----------------------------------------------------------
-				Intent intent = new Intent(mActivity, OuterInspectActivity.class);
-				Bundle bundle = new Bundle();
-				bundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, mCarList.get(position));
-				bundle.putInt(OUTCHECKTYPE, mOutCheckType);
-				bundle.putString("jylsh", jylsh);
-				bundle.putString("jycs", jycs);
-				intent.putExtras(bundle);
-				startActivity(intent);
-				//------------------单机评审版结束-------------------------------------------------------
+				ToastUtils.showToast(mActivity, id+",网络问题,获取不到平台必检项目", Toast.LENGTH_LONG);
+				//=====测试开始start========================
+//				jcxmArray = "48".split(",");
+//				startInspectAty(jylsh,jycs,position,jcxmArray);
+				
+				//=====测试结束start=========================
 			}
 		});
+		
 	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * 转到检测activity
+	 * @param jylsh
+	 * @param jycs
+	 * @param position
+	 * @param jcxms
+	 */
+	private void startInspectAty(final String jylsh, final String jycs, final int position,String[] jcxms) {
+		Intent intent = new Intent(mActivity, OuterInspectActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, mCarList.get(position));
+		bundle.putInt(OUTCHECKTYPE, mOutCheckType);
+		bundle.putString("jylsh", jylsh);
+		bundle.putString("jycs", jycs);
+		bundle.putStringArray("jcxms", jcxms);
+		intent.putExtras(bundle);
+		startActivity(intent);
+	}
+	
 	
 	
 	
@@ -393,6 +534,17 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 	@Override
 	public void onRefresh() {
 		mHandler.sendEmptyMessageDelayed(REFRESH_COMPLETE, 0);  
+	}
+	
+	private List<CarListInfoEntity> getListByPeriod(List<CarListInfoEntity> list,int period){
+		List<CarListInfoEntity> periodList = new ArrayList<CarListInfoEntity>();
+		for(CarListInfoEntity carListInfoEntity:list){
+			String date = carListInfoEntity.getDate();
+			if(DateUtils.compareDate(date, period)){
+				periodList.add(carListInfoEntity);
+			}
+		}
+		return periodList;
 	}
 	
 	

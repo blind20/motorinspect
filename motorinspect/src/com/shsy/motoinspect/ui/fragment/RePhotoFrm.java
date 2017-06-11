@@ -167,6 +167,21 @@ public class RePhotoFrm extends BaseFragment {
 				tv_hint.setTextColor(getResources().getColor(R.color.deep_red));
 				tv_hint.setText(getString(R.string.network_error));
 				mCarList.clear();
+				//测试代码开始
+//				CarListInfoEntity car = new CarListInfoEntity();
+//				car.setClsbdh("LFMAP92A2800118096");
+//				car.setDate("2017-04-11");
+//				car.setFlag(1);
+//				car.setHphm("苏WEQW1");
+//				car.setHpzl("02");
+//				car.setId("215");
+//				car.setJcxdh("1");
+//				car.setJycs(1);
+//				car.setJyjgbh("3209000008");
+//				car.setJyxm("F1,C1,DC,B1,B2,B3,B0,H1,H4,S1");
+//				car.setLsh("32090017040100224");
+//				mCarList.add(car);
+				//测试代码结束
 				viewSetAdapter(mCarList);
 				e.printStackTrace();
 			}

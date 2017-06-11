@@ -18,6 +18,7 @@ import com.shsy.motoinspect.entity.CarListInfoEntity;
 import com.shsy.motoinspect.network.ListCarInfoCallback;
 import com.shsy.motoinspect.ui.activity.OuterInspectActivity;
 import com.shsy.motoinspect.ui.activity.SettingsActivity;
+import com.shsy.motoinspect.utils.DateUtils;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
 import com.shsy.motoinspect.utils.ToastUtils;
@@ -29,6 +30,8 @@ import com.zhy.http.okhttp.callback.StringCallback;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -38,8 +41,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 import okhttp3.Call;
 
@@ -66,6 +71,9 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 	public static final String ROADTEST_HPHM ="hphm";
 	public static final String ROADTEST_JYLSH ="jylsh";
 	
+	private String[] mPeriods = {"三天内", "一周内", "两周内", "一月内"};
+	private List<CarListInfoEntity> mTotalList;
+	
 	private Integer mPosition;
 	private String msgFormat;
 	
@@ -79,6 +87,7 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 					adpter.notifyDataSetChanged();
 				}
 				mSwipeLayout.setRefreshing(false);
+				mTitleBarView.getTitleRight().setText(mPeriods[0]);
 				break;
 
 			}
@@ -137,7 +146,7 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 	public void initView(int type) {
 		mTitleBarView = new TitleBarView(mActivity);
 		mTitleBarView = (TitleBarView) mRootView.findViewById(R.id.titlebar);
-		mTitleBarView.setCommonTitle(View.VISIBLE, View.VISIBLE, View.GONE);
+		mTitleBarView.setCommonTitle(View.VISIBLE, View.VISIBLE, View.VISIBLE);
 		mSwipeLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.id_swipe_ly);
 		
 		switch (type) {
@@ -156,13 +165,67 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 				mCallback.onPullBack();
 			}
 		});
+		mTitleBarView.getTitleRight().setText(mPeriods[0]);
+		mTitleBarView.setBtnRightOnclickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onPopupWindow();
+			}
+		});
 		
 		mListView = (ListView) mRootView.findViewById(R.id.lv_carinspect);
 		mSwipeLayout.setOnRefreshListener(this);
 	}
+	
+	
+	protected void onPopupWindow() {
+		View popupView = mActivity.getLayoutInflater().inflate(R.layout.popupwindow, null);
+		ListView lvPeriod = (ListView) popupView.findViewById(R.id.lv_period);
+		lvPeriod.setAdapter(new ArrayAdapter<String>(mActivity, android.R.layout.simple_list_item_1, mPeriods));
+		final PopupWindow window = new PopupWindow(popupView, 400, 600);
+        window.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F8F8F8")));
+        window.setFocusable(true);
+        window.setOutsideTouchable(true);
+        window.update();
+        window.showAsDropDown(mTitleBarView.getTitleRight(), 0, 5);
+        
+        lvPeriod.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				int period = CommonConstants.DAYS3;
+				switch (position) {
+				case 0:
+					period =CommonConstants.DAYS3;;
+					mTitleBarView.getTitleRight().setText(mPeriods[0]);
+					break;
+				case 1:
+					period =CommonConstants.DAYS7;
+					mTitleBarView.getTitleRight().setText(mPeriods[1]);
+					break;
+				case 2:
+					period =CommonConstants.DAYS14;
+					mTitleBarView.getTitleRight().setText(mPeriods[2]);
+					break;
+				case 3:
+					period =CommonConstants.DAYS30;
+					mTitleBarView.getTitleRight().setText(mPeriods[3]);
+					break;
+				}
+				mCarList = getListByPeriod(mTotalList, period);
+//				ToastUtils.showToast(mActivity, "size="+mCarList.size(), Toast.LENGTH_LONG);
+				if(mCarList.size()!=0){
+					adpter.setDatas(mCarList);
+					adpter.notifyDataSetChanged();
+				}
+				window.dismiss();
+			}
+		});
+	}
+	
 
 	private void initDatas(int type) {
 		mCarList = new ArrayList<CarListInfoEntity>();
+		mTotalList = new ArrayList<CarListInfoEntity>();
 		
 //		mCarList.add(new CarListInfoEntity("苏C2868J", "小型汽车", "2016050123985890", "2016-03-02",CommonConstants.NOTPULLCAR
 //				,"",1,"","","","01"));
@@ -215,8 +278,9 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 
 			@Override
 			public void onResponse(List<CarListInfoEntity> list, int id) {
+				mTotalList = list;
 				mCarList.clear();
-				mCarList.addAll(list);
+				mCarList.addAll(getListByPeriod(mTotalList, CommonConstants.DAYS3));
 				viewSetAdapter(type);
 			}
 			
@@ -411,6 +475,20 @@ public class PullCarToLineFrm extends BaseFragment implements SwipeRefreshLayout
 		super.onResume();
 		onRefresh();
 	}
+	
+	
+	private List<CarListInfoEntity> getListByPeriod(List<CarListInfoEntity> list,int period){
+		List<CarListInfoEntity> periodList = new ArrayList<CarListInfoEntity>();
+		for(CarListInfoEntity carListInfoEntity:list){
+			String date = carListInfoEntity.getDate();
+			if(DateUtils.compareDate(date, period)){
+				periodList.add(carListInfoEntity);
+			}
+		}
+		return periodList;
+	}
+	
+	
 	
 	protected OnPullBackListener mCallback;
 	public interface OnPullBackListener{
