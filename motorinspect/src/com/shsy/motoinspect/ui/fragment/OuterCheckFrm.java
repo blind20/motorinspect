@@ -249,12 +249,14 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 		mTotalList = new ArrayList<CarListInfoEntity>();
 		jcxmArray = new String[]{};
 		
-		//测试代码
+		//========测试代码================
 //		mCarList.add(new CarListInfoEntity("苏C2868J", "小型汽车", "2016050123985890", "2016-03-02",CommonConstants.NOTPULLCAR
 //				,"",1,"","","",""));
 //		mCarList.add(new CarListInfoEntity("苏J1111J", "小型汽车", "2016050123985892", "2016-03-03",CommonConstants.NOTPULLCAR
 //				,"",1,"","","",""));
 //		viewSetAdapter();
+		//=======测试代码结束===========
+		
 		
 		//根据mOutCheckType 跳转请求http
 		getCarListByCheckType(mOutCheckType);
@@ -348,6 +350,11 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				checkStart(mOutCheckType,position);
+				
+				//测试开始
+//				jcxmArray = "1,2,3,48".split(",");
+//				startInspectAty("2016050123985892","1",position,jcxmArray);
+				//测试结束
 			}
 		});
 	}
@@ -434,13 +441,13 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 			
 			@Override
 			public void onError(Call call, Exception e, int id) {
+				mProgressDlg.dismiss();
 //				ToastUtils.showToast(mActivity, "网络问题,请检查网络", Toast.LENGTH_LONG);
 				//=========测试开始test start=======
 //				getDefalutJcxmByNetwork(jylsh,mOutCheckType,jycs, position);
-				
 				//=========测试结束test end==========
 				Logger.show(TAG, "checkStartNetWork onError");
-				mProgressDlg.dismiss();
+				
 				e.printStackTrace();
 			}
 		});
@@ -490,7 +497,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 			public void onError(Call call, Exception e, int id) {
 				ToastUtils.showToast(mActivity, id+",网络问题,获取不到平台必检项目", Toast.LENGTH_LONG);
 				//=====测试开始start========================
-//				jcxmArray = "48".split(",");
+//				jcxmArray = "1,2,3,48".split(",");
 //				startInspectAty(jylsh,jycs,position,jcxmArray);
 				
 				//=====测试结束start=========================

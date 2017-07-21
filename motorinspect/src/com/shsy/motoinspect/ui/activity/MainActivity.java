@@ -16,6 +16,7 @@ import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import android.app.Application;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -228,6 +229,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 		}else if(menuTitle.equals(getString(R.string.outer_nav1_menu4))){
 			
 			ft.replace(R.id.fl_carinfo, RePhotoFrm.instantiate(MainActivity.this, RePhotoFrm.class.getName(),bundle));
+			
 		}
 			
 		ft.commit();

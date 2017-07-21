@@ -53,6 +53,9 @@
         <activity android:name="com.shsy.motoinspect.ui.activity.VehListActivity"
             android:screenOrientation="portrait"
              />
+        <activity android:name="com.shsy.motoinspect.ui.activity.DimensionWeightActivity"
+            android:screenOrientation="portrait"
+             />
         
     </application>
 

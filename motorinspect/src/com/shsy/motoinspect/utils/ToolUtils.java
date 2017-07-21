@@ -208,6 +208,10 @@ public class ToolUtils {
 		return getServerHost(con) + "/pda/getVehInOfHphm";
 	}	
 	
+	
+
+	
+	
 
 	@SuppressLint("SimpleDateFormat")
 	public static String getCurDate() {

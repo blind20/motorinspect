@@ -16,7 +16,7 @@ public class TabAdapter extends FragmentPagerAdapter {
 //			{ "车辆外观", "安全装置", "底盘", "检验结果", "拍照" };
 	
 	public static String[] APPEARANCETITLES = new String[]
-			{ "唯一性", "特征参数", "外观检查" ,"安全装置" ,"拍照"};
+			{ "唯一性", "特征参数", "外观检查" ,"安全装置" ,"外廓尺寸","拍照"};
 	public static String[] CHASSISTITLES = new String[]
 			{ "底盘部件检查"};
 	public static String[] DYNAMICTITLES = new String[]

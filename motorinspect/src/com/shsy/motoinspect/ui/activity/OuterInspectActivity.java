@@ -56,7 +56,7 @@ import com.zhy.http.okhttp.builder.PostFormBuilder;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 public class OuterInspectActivity extends BaseActivity implements View.OnClickListener,
-OuterCheckItemsFrm.OnClickCheckItemListener{
+OuterCheckItemsFrm.OnClickCheckItemListener,OuterItemFailReasonFrm.OnClickDimenseListener{
 
 	protected TitleBarView mTitleBarView;
 	
@@ -161,6 +161,8 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 		
 		switch (type) {
 			case CommonConstants.APPEARANCE:
+//				OuterItemFailReasonFrm outerItemFailReasonFrm = new OuterItemFailReasonFrm();
+//				fms.add(outerItemFailReasonFrm);
 				int len = 0;
 				int start =1;
 				for(int i=1;i<=4;i++){
@@ -180,6 +182,8 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 					len = checkitems.length;
 					setValueToSpareArray(list);
 				}
+				OuterItemFailReasonFrm outerItemFailReasonFrm = new OuterItemFailReasonFrm();
+				fms.add(outerItemFailReasonFrm);
 				//mPohtos引用取得拍摄的照片种类
 				Bundle bundle = new Bundle();
 				bundle.putString("jylsh", jylsh);
@@ -337,9 +341,8 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 			return;
 		}
 		
-		
-		
 		ProgressDlgUtil.showProgressDialog(this, "正在上传,请等待...");
+		
 		
 		MyHttpUtils.getInstance(this).postHttpByParam(url, putCheckItemParams(type), new StringCallback(){
 			
@@ -393,6 +396,22 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 			map.put("Item"+seq, Integer.toString(flag));
 			Logger.show(TAG, "item"+seq+":"+flag+"\n\r");
 		}
+		if(CommonConstants.APPEARANCE == mOutCheckType){
+			if(!TextUtils.isEmpty(length)){
+				map.put("cwkc",length);
+			}
+			if(!TextUtils.isEmpty(width)){
+				map.put("cwkk",width);
+			}
+			if(!TextUtils.isEmpty(height)){
+				map.put("cwkg",height);
+			}
+			if(!TextUtils.isEmpty(weight)){
+				map.put("zbzl",weight);
+			}
+//			Logger.show(TAG, "length"+":"+map.get("cwkc")+";width"+":"+map.get("cwkk")+";height"+":"+map.get("cwkg")+";weight"+":"+map.get("zbzl"));
+		}
+		
 		return map;
 	}
 	
@@ -404,5 +423,20 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 	}
 
 
+	private String length;
+	private String width;
+	private String height;
+	private String weight;
+	@Override
+	public void onClickDimense(String length, String width, String height, String weight) {
+//		Logger.show(TAG, "length"+":"+length+";width"+":"+width+";height"+":"+height+";weight"+":"+weight);
+		this.length = length;
+		this.width=width;
+		this.height = height;
+		this.weight = weight;
+	}
+
+
+	
 	
 }

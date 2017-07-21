@@ -41,6 +41,7 @@
     <string name="outer_nav1_menu2">底盘动态检查</string>
     <string name="outer_nav1_menu3">底盘部件检查</string>
     <string name="outer_nav1_menu4">重新拍照或补拍</string>
+    <string name="outer_nav1_menu5">人工外廓及质量</string>
     <string name="outer_nav2_menu1">引车上线</string>
     <string name="outer_nav2_menu2">工位复位</string>
     <string name="outer_nav2_menu3">路试引车</string>
@@ -49,6 +50,7 @@
     <string name="outer_nav1_menu2_des">包含底盘动态检查</string>
     <string name="outer_nav1_menu3_des">包含底盘部件检查</string>
     <string name="outer_nav1_menu4_des">外观照片重新拍照或补拍照片</string>
+    <string name="outer_nav1_menu5_des">人工检测外廓长宽高及整备质量</string>
     <string name="outer_nav2_menu1_des">引车员引车上线</string>
     <string name="outer_nav2_menu2_des">终端上复位工位</string>
     <string name="outer_nav2_menu3_des">路试引车上线</string>
@@ -65,6 +67,18 @@
 	<string name="rephoto_hint">提示:输入号牌号码后4位字母或数字(不能输入汉字)</string>
 	<string name="rephoto_hint1">没有找到该号牌车辆</string>
 	<string name="rephoto_hint2">查找到的车辆(数量多时可以下拉)</string>
+	<string name="hint_dimense_length">请输入外廓长度</string>
+	<string name="hint_dimense_width">请输入外廓宽度</string>
+	<string name="hint_dimense_height">请输入外廓高度</string>
+	<string name="tv_please_dimense">请输入人工检测的外廓尺寸</string>
+	<string name="hint_curb_weight">请输入整备质量</string>
+	<string name="tv_please_curb_weight">请输入人工检测的整备质量</string>
+	<string name="tv_curb_weight">整备质量：</string>
+	<string name="tv_dimense_length">外廓长度：</string>
+	<string name="tv_dimense_width">外廓宽度：</string>
+	<string name="tv_dimense_height">外廓高度：</string>
+	<string name="upload_dimense">上传外廓尺寸</string>
+	<string name="upload_weight">上传整备质量</string>
 	
 	
 	<string name="roadtest_brake_start">制动开始</string>
