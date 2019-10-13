@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.shsy.motorinspect"
-    android:versionCode="1"
-    android:versionName="车检智能终端V0.11" >
+    android:versionCode="2"
+    android:versionName="车检智能终端V0.2" >
 
     <uses-sdk
         android:minSdkVersion="11"

@@ -53,7 +53,7 @@
     <string name="outer_nav2_menu2_des">终端上复位工位</string>
     <string name="outer_nav2_menu3_des">路试引车上线</string>
     
-    <string name="veh_jcx">检测线</string>
+    <string name="veh_jcx">号检测线</string>
     <string name="veh_sendback">退办</string>
     <string name="is_confirm_roadtest">是否确定%1$s路试引车</string>
     <string name="is_confirm_pullcar">是否确定%1$s引车上线</string>

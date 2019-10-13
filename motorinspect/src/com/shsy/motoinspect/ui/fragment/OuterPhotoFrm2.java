@@ -101,6 +101,7 @@ public class OuterPhotoFrm2 extends BaseFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		carInfo = getArguments().getParcelable("carInfo");
+		
 		mInitList = new ArrayList<CarPhotoEntity>();
 		sTxtNote = mActivity.getResources().getString(R.string.is_must_photo);
 	}

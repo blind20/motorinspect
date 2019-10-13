@@ -1,5 +1,6 @@
 package com.shsy.motoinspect.ui.fragment;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -291,6 +292,24 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 			return;
 		}
 		headers.put("Cookie", "JSESSIONID="+session);
+		
+		
+		/*OkHttpUtils.post().url(url).headers(headers)
+		.build().execute(new StringCallback() {
+			
+			@Override
+			public void onResponse(String arg0, int id) {
+				// TODO Auto-generated method stub
+				Logger.show(getTag(), "onResponse="+arg0);
+			}
+			
+			@Override
+			public void onError(Call call, Exception e, int id) {
+				// TODO Auto-generated method stub
+				Logger.show("onError", e.getMessage());
+			}
+		});	*/
+		
 
 		OkHttpUtils.post().url(url).headers(headers)
 				.build().execute(new ListCarInfoCallback(){
@@ -298,7 +317,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 			@Override
 			public void onError(Call call, Exception e, int id) {
 				ToastUtils.showToast(mActivity, mActivity.getString(R.string.not_connect_server), Toast.LENGTH_LONG);
-//				Logger.show(getTag(), e.getMessage());
+				Logger.show(getTag(), e.getMessage());
 				e.printStackTrace();
 			}
 
@@ -336,7 +355,9 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 				holder.setText(R.id.tv_hphm, t.getHphm())
 					  .setText(R.id.tv_hpzl, convertCode(t.getHpzl()))
 					  .setText(R.id.tv_lsh, t.getLsh())
+					  .setText(R.id.tv_line_num, t.getJcxdh()+"号线")
 					  .setText(R.id.tv_date, t.getDate());
+				
 			}
 		};
 		
@@ -362,7 +383,7 @@ public class OuterCheckFrm extends BaseFragment implements SwipeRefreshLayout.On
 		String url = ToolUtils.getProcessStartUrl(mActivity);
 		String jyxm = getCheckJyxm(mOutCheckType);
 		String jylsh = mCarList.get(position).getLsh();
-		String jycs = "1";
+		String jycs = Integer.toString(mCarList.get(position).getJycs());
 		mProgressDlg.setMessage("获取检测开始时间");
 		mProgressDlg.show();
 		checkStartNetWork(url,jylsh,jyxm,jycs,position);

@@ -113,6 +113,8 @@ public class OuterPhotoFrm extends BaseFragment {
 		isRePhoto = getArguments().getBoolean("isrephoto", false);
 		carInfo = getArguments().getParcelable(CommonConstants.BUNDLE_TO_OUTER);
 		Logger.show("rephoto", "car="+carInfo.getJyjgbh());
+		
+		
 		if(!isRePhoto){
 			jylsh = getArguments().getString("jylsh");
 		}
@@ -411,6 +413,7 @@ public class OuterPhotoFrm extends BaseFragment {
 	
 	
 	private Map<String, String> packZpInfoByArgu(CarPhotoEntity carPhoto,CarListInfoEntity carInfo){
+		
 		Map<String,String> map = new HashMap<String,String>();
 		map.put("jyjgbh",carInfo.getJyjgbh());
 		map.put("jcxdh",carInfo.getJcxdh());

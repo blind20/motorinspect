@@ -265,7 +265,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 			CheckItemEntity checkitem = new CheckItemEntity();
 			checkitem.setSeq(start+i);
 			checkitem.setTextCheckItem(items[i]);
-			checkitem.setCheckflag(CommonConstants.NOTCHECK);
+			checkitem.setCheckflag(CommonConstants.CHECKPASS);
 			list.add(checkitem);
 		}
 		if(list.get(len-1).getSeq()==42){

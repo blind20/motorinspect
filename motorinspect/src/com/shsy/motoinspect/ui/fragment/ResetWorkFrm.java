@@ -227,9 +227,12 @@ public class ResetWorkFrm extends BaseFragment implements SwipeRefreshLayout.OnR
 			for(int i=0;i<jsons.length();i++){
 				WorkStation ws = new WorkStation();
 				ws.id = jsons.getJSONObject(i).getString("id");
-				String name = jsons.getJSONObject(i).getString("name");
-				ws.jcxdh = name.split("线")[0]+ getString(R.string.veh_jcx);
-				ws.wsxh = name.split("线")[1];
+//				String name = jsons.getJSONObject(i).getString("name");
+//				ws.jcxdh = name.split("线")[0]+ getString(R.string.veh_jcx);
+//				ws.wsxh = name.split("线")[1];
+				
+				ws.jcxdh = jsons.getJSONObject(i).getString("jcxdh")+getString(R.string.veh_jcx);
+				ws.wsxh = jsons.getJSONObject(i).getString("sort")+"工位";
 				list.add(ws);
 			}
 		} catch (JSONException e) {

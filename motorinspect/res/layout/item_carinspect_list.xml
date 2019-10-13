@@ -16,6 +16,13 @@
         android:textSize="16sp"
         android:text="苏J2868J"
         />
+    <TextView android:id="@+id/tv_line_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        />
 
     <TextView android:id="@+id/tv_hpzl"
         android:layout_width="wrap_content"
