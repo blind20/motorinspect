@@ -3,7 +3,6 @@ package com.shsy.motoinspect.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,29 +12,18 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import org.apache.http.util.EncodingUtils;
 
 import com.shsy.motoinspect.CommonConstants;
-import com.shsy.motoinspect.entity.CarPhotoEntity;
-import com.shsy.motoinspect.ui.fragment.OuterCheckFrm;
-import com.shsy.motoinspect.ui.fragment.OuterPhotoFrm;
-import com.shsy.motorinspect.R;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.view.Gravity;
-import android.widget.Toast;
+import android.os.Build;
 
 public class ToolUtils {
 
@@ -51,6 +39,53 @@ public class ToolUtils {
 			return "";
 		}
 		return "http://" + ip + ":" + port +"/veh";
+	}
+	
+	//整备质量上线车辆列表URL
+	public static String getZbzlCarList(Context con){
+		if("".equals(getServerHost(con))){
+			return "";
+		}
+		return getServerHost(con) + "/pda/getZ1CheckList";
+	}
+	//整备质量仪器列表
+	public static String getZ1Device(Context con){
+		if("".equals(getServerHost(con))){
+			return "";
+		}
+		return getServerHost(con) + "/pda/getZ1Device";
+	}
+	
+	//整备质量前轴/后轴到位
+	public static String z1dw(Context con){
+		if("".equals(getServerHost(con))){
+			return "";
+		}
+		return getServerHost(con) + "/pda/z1dw";
+	}
+	
+	//整备质量引车
+	public static String upZ1(Context con){
+		if("".equals(getServerHost(con))){
+			return "";
+		}
+		return getServerHost(con) + "/pda/upZ1";
+	}	
+	
+	
+	//独立驱动轴称重车辆列表URL
+	public static String getQDZCarList(Context con){
+		if("".equals(getServerHost(con))){
+			return "";
+		}
+		return getServerHost(con) + "/pda/getQDZCheckList";
+	}
+	//独立驱动轴称重引车
+	public static String upQDZ(Context con){
+		if("".equals(getServerHost(con))){
+			return "";
+		}
+		return getServerHost(con) + "/pda/upQDZ";
 	}
 	
 	
@@ -119,6 +154,14 @@ public class ToolUtils {
 		return getServerHost(con) + "/pda/external";
 	}
 
+	//上传外检照片URL
+	public static String uploadVideo(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/video/uploadVideo";
+	}
+		
 	// 上传动态底盘项目URL
 	public static String externalUrlDC(Context con) {
 		if ("".equals(getServerHost(con))) {
@@ -208,6 +251,79 @@ public class ToolUtils {
 		return getServerHost(con) + "/pda/getVehInOfHphm";
 	}	
 	
+	
+	// 复检车辆列表
+	public static String getCheckedList(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/getCheckedList";
+	}
+	
+	// 未完成检测车辆列表
+	public static String getVehChecking(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/veh/getVehChecking";
+	}
+	
+	// 获取车辆检测过程
+	public static String getProcess(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/report/getProcess";
+	}
+	
+	// 获取检测线列表
+	public static String getLines(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/getLines";
+	}
+	
+	// 获取检测线列表
+	public static String getCheckEvents(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/report/getCheckEvents";
+	}
+
+	// 获取检测线列表
+	public static String relogin(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/relogin";
+	}
+	
+	// 下线车辆列表URL
+	public static String getCheckQueueVeh(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/getCheckQueueVeh";
+	}
+	
+	// 下线URL
+	public static String downLine(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/downLine";
+	}
+
+	// 上线
+	public static String reUpLine(Context con) {
+		if ("".equals(getServerHost(con))) {
+			return "";
+		}
+		return getServerHost(con) + "/pda/reUpLine";
+	}
+	
 
 	@SuppressLint("SimpleDateFormat")
 	public static String getCurDate() {
@@ -216,22 +332,28 @@ public class ToolUtils {
 		return dateFormat.format(date);
 	}
 	
-	public static String deviceImei(){
-		Context context = ContextUtil.getInstance();
-		String devImei;
-		TelephonyManager tm = (TelephonyManager)context.getSystemService(
-				Context.TELEPHONY_SERVICE);
-		try {
-			devImei = tm.getDeviceId();
-		} catch (Exception e) {
-			devImei = "";
-		}
-		return devImei;
+	public static String getUUID(Context con){
+		int first = new Random(10).nextInt(8) + 1;
+        System.out.println(first);
+        int hashCodeV = UUID.randomUUID().toString().hashCode();
+        if (hashCodeV < 0) {//有可能是负数
+            hashCodeV = -hashCodeV;
+        }
+        // 0 代表前面补充0
+        // 4 代表长度为4
+        // d 代表参数为正数型
+        return first + String.format("%014d", hashCodeV);
 	}
 	
-	public static String imei2active(){
-		Log.i("imei2active", "imei2active:"+ getEncodeStr(deviceImei()));
-		return getEncodeStr(deviceImei());
+	public static String getIMEI(){
+		return "35" + //we make this look like a valid IMEI
+	            Build.BOARD.length()%10+ Build.BRAND.length()%10 + 
+	            Build.CPU_ABI.length()%10 + Build.DEVICE.length()%10 + 
+	            Build.DISPLAY.length()%10 + Build.HOST.length()%10 + 
+	            Build.ID.length()%10 + Build.MANUFACTURER.length()%10 + 
+	            Build.MODEL.length()%10 + Build.PRODUCT.length()%10 + 
+	            Build.TAGS.length()%10 + Build.TYPE.length()%10 + 
+	            Build.USER.length()%10 ; //13 digits
 	}
 	
 	 /** 

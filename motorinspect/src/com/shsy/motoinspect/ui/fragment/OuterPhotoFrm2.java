@@ -18,7 +18,6 @@ import com.shsy.motoinspect.adapter.GridAdapter;
 import com.shsy.motoinspect.entity.CarListInfoEntity;
 import com.shsy.motoinspect.entity.CarPhotoEntity;
 import com.shsy.motoinspect.network.MyHttpUtils;
-import com.shsy.motoinspect.ui.activity.OuterInspectActivity;
 import com.shsy.motoinspect.utils.DensityUtil;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.PictureUtil;
@@ -28,11 +27,8 @@ import com.shsy.motoinspect.utils.TakePhotoUtil;
 import com.shsy.motoinspect.utils.ToastUtils;
 import com.shsy.motoinspect.utils.ToolUtils;
 import com.shsy.motorinspect.R;
-import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -418,9 +414,34 @@ public class OuterPhotoFrm2 extends BaseFragment {
 		options.inSampleSize = scale;
 		options.inPurgeable = true;
 		options.inJustDecodeBounds = false;
-		Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+//		Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
 		
-		return PictureUtil.drawTextToBitmap(bitmap, ToolUtils.getCurDate());
+		CarPhotoEntity carPhoto = mInitList.get(mPosition);
+		String row1 = ToolUtils.getCurDate()+" 操作员:"
+				+(String)SharedPreferenceUtils.get(mActivity, CommonConstants.REALNAME, "")
+				+" IMEI:"+ToolUtils.getIMEI();
+		String row2 = "照片名称:"+carPhoto.getPhotoTypeCode()+carPhoto.getPhotoTypeName();
+		String row3 = "流水号:"+carInfo.getLsh();
+		String row4 = "号牌号码:";
+		if(!TextUtils.isEmpty(carInfo.getHphm())){
+			row4 = row4 + carInfo.getHphm();
+		}
+		String row5 = "号牌种类:";
+		if(!TextUtils.isEmpty(carInfo.getHphm())){
+			row5 = row5 + carInfo.getHpzl();
+		}
+		String row6 = "车架号:"+carInfo.getClsbdh();
+		
+		Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+		bitmap = PictureUtil.drawTextToBitmapByxy(bitmap, row1, 10, 30); 
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row2, 10, 60);
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row3, 10, 90);
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row4, 10, 120);
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row5, 10, 150);
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row6, 10, 180);
+		
+		
+		return bitmap;
 	}
 	
 

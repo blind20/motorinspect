@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class SettingServerFrm extends BaseFragment {
+public class ServerFrm extends BaseFragment {
 
 	private EditText et_ip;
 	private EditText et_port;
@@ -27,7 +27,7 @@ public class SettingServerFrm extends BaseFragment {
 	public String ip;
 	public String port;
 	
-	public SettingServerFrm(){
+	public ServerFrm(){
 	}
 	
 	

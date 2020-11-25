@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include android:id="@+id/toptitle" layout="@layout/top"/> 
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        android:text="检验项目"
+        android:padding="3dp"
+        android:background="#DFEFFF"
+        />
+    <GridView android:id="@+id/grid_check"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:numColumns="4"
+        android:gravity="center"
+        android:cacheColorHint="@android:color/transparent"
+        android:listSelector="@android:color/transparent"
+        android:horizontalSpacing="1dp"
+        android:verticalSpacing="1dp"
+        android:scrollbars="none"
+        />
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:background="@color/border"
+        />
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        android:text="原检测线"
+        android:layout_marginTop="2dp"
+        android:padding="3dp"
+        android:background="#DFEFFF"
+        />
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:orientation="horizontal">
+        <TextView 
+        android:id="@+id/tv_from_line_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:padding="3dp"
+        />
+        <TextView 
+        android:id="@+id/tv_from_line_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:singleLine="true"
+        android:padding="3dp"
+        android:textColor="@android:color/holo_red_light"
+        />
+        <TextView 
+        android:id="@+id/tv_from_line_jzflag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:singleLine="true"
+        android:padding="3dp"
+        android:textColor="@android:color/holo_red_light"
+        />
+	</LinearLayout>
+	
+    <View  
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:background="@color/border"
+        />
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        android:text="现检测线"
+        android:layout_marginTop="2dp"
+        android:padding="3dp"
+        android:background="#DFEFFF"
+        />
+    
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:orientation="horizontal">
+        <Spinner
+	    android:id="@+id/sp_to_line"
+	    android:layout_width="150dp"
+	    android:layout_height="wrap_content"
+	    android:minHeight="30dp"
+	    android:spinnerMode="dialog" />
+        <TextView 
+        android:id="@+id/tv_to_line_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:singleLine="true"
+        android:padding="3dp"
+        android:textColor="@android:color/holo_red_light"
+        />
+        <TextView 
+        android:id="@+id/tv_to_line_jzflag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:singleLine="true"
+        android:padding="3dp"
+        android:textColor="@android:color/holo_red_light"
+        />
+	</LinearLayout>
+    
+    <CheckBox android:id="@+id/cb_weight"
+         android:layout_marginTop="20dp"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="复检称重"/>
+    
+    <Button 
+        android:id="@+id/btn_recheck"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
+        android:text="复检"
+        android:layout_gravity="center"
+        android:textColor="#ffffff"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/login_btn"
+        android:textSize="16sp"/>
+</LinearLayout>
+
+
+

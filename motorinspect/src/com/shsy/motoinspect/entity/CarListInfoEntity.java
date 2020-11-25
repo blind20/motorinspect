@@ -18,13 +18,16 @@ public class CarListInfoEntity implements Parcelable{
 	private String jcxdh;
 	private String clsbdh;
 	private String id;
+	private int checkType;
+	private int zjlb;
+	private String fjjyxm;
 	
 	public CarListInfoEntity(){
 		
 	}
 
 	public CarListInfoEntity(String hphm, String hpzl, String lsh, String date, int flag, String jyjgbh, int jycs,
-			String jyxm, String jcxdh, String clsbdh,String id) {
+			String jyxm, String jcxdh, String clsbdh,String id,int checkType,int zjlb,String fjjyxm) {
 		super();
 		this.hphm = hphm;
 		this.hpzl = hpzl;
@@ -37,6 +40,9 @@ public class CarListInfoEntity implements Parcelable{
 		this.jcxdh = jcxdh;
 		this.clsbdh = clsbdh;
 		this.id = id;
+		this.checkType = checkType;
+		this.zjlb = zjlb;
+		this.fjjyxm = fjjyxm;
 	}
 
 	
@@ -129,6 +135,32 @@ public class CarListInfoEntity implements Parcelable{
 	public void setId(String id) {
 		this.id = id;
 	}
+	
+	public int getCheckType() {
+		return checkType;
+	}
+	
+	public void setCheckType(int checkType) {
+		this.checkType = checkType;
+	}
+	
+
+	public int getZjlb() {
+		return zjlb;
+	}
+
+	public void setZjlb(int zjlb) {
+		this.zjlb = zjlb;
+	}
+
+	public String getFjjyxm() {
+		return fjjyxm;
+	}
+
+	public void setFjjyxm(String fjjyxm) {
+		this.fjjyxm = fjjyxm;
+	}
+
 
 
 	public final static Parcelable.Creator<CarListInfoEntity> CREATOR =new Creator<CarListInfoEntity>() {
@@ -152,6 +184,9 @@ public class CarListInfoEntity implements Parcelable{
 			car.jcxdh = source.readString();
 			car.clsbdh = source.readString();
 			car.id = source.readString();
+			car.checkType = source.readInt();
+			car.zjlb = source.readInt();
+			car.fjjyxm = source.readString();
 			return car;
 		}
 	};
@@ -176,6 +211,9 @@ public class CarListInfoEntity implements Parcelable{
 		dest.writeString(jcxdh);
 		dest.writeString(clsbdh);
 		dest.writeString(id);
+		dest.writeInt(checkType);
+		dest.writeInt(zjlb);
+		dest.writeString(fjjyxm);
 	}
 	
 	

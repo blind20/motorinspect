@@ -1,8 +1,5 @@
 package com.shsy.motoinspect.common;
 
-import com.shsy.motoinspect.ui.fragment.OuterItemFailReasonFrm;
-import com.shsy.motoinspect.utils.Logger;
-import com.shsy.motorinspect.R;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -10,7 +7,6 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -112,5 +108,6 @@ public class ViewHolder {
 	public ImageView getImageView(int viewId){
 		return (ImageView)getView(viewId);
 	}
+
 
 }

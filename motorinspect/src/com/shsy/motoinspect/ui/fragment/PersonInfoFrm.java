@@ -17,7 +17,8 @@ import com.shsy.motoinspect.entity.CarListInfoEntity;
 import com.shsy.motoinspect.network.ListCarInfoCallback;
 import com.shsy.motoinspect.network.PersistentCookieStore;
 import com.shsy.motoinspect.ui.activity.SettingsActivity;
-import com.shsy.motoinspect.ui.fragment.SettingLoginFrm.OnLoginListener;
+import com.shsy.motoinspect.ui.fragment.LoginFrm.OnLoginListener;
+import com.shsy.motoinspect.ui.fragment.NavigationFrm.OnMenuSelListener;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.PhoneUtils;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
@@ -89,7 +90,7 @@ public class PersonInfoFrm extends BaseFragment implements View.OnClickListener{
 					intent.putExtra(CommonConstants.TO_SETTING, position);
 					startActivity(intent);
 				}else if(position == 1){
-					ToastUtils.showToast(mActivity, "攻城狮在升级...", Toast.LENGTH_SHORT);
+					mCallback.onItemSel(position);
 				}
 				else if(position == 2){
 					String version = PhoneUtils.getVersionName(mActivity);
@@ -175,7 +176,6 @@ public class PersonInfoFrm extends BaseFragment implements View.OnClickListener{
 		String[] itemTexts = getResources().getStringArray(R.array.pernfrm_item);
 		String[] itemImgs = getResources().getStringArray(R.array.pernfrm_item_img);
 		for(int i=0;i<itemTexts.length;i++){
-			Logger.show(getTag(), "personImg:" + itemImgs[i]);
 			int resId = getResources().getIdentifier(itemImgs[i], "drawable", "com.shsy.motorinspect");
 			list.add(new ItemHolder(itemTexts[i], resId));
 		}
@@ -211,6 +211,27 @@ public class PersonInfoFrm extends BaseFragment implements View.OnClickListener{
 		Intent intent = new Intent(mActivity,SettingsActivity.class);
 		intent.putExtra(CommonConstants.TO_SETTING, -1);
 		startActivityForResult(intent, CommonConstants.REQUEST_LOGIN);
+	}
+	
+	
+	/**
+	 * 回调接口定义及attach
+	 */
+	protected OnItemSelListener mCallback;
+	public interface OnItemSelListener{
+		public void onItemSel(int position);
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			mCallback = (OnItemSelListener) mActivity;
+		} catch (ClassCastException e) {
+			e.printStackTrace();
+			throw new ClassCastException(mActivity.toString()
+					+ " must implement OnItemSelListener");
+		}
 	}
 	
 }

@@ -120,11 +120,12 @@
   	</string-array>
 
     
-     <string-array name="photoname">        
+     <!-- <string-array name="photoname">        
      <item>车辆识别代号</item>
      <item>车辆左前45度</item>
      <item>车辆右后45度</item>  
-     <item>座椅安全带</item> 
+     <item>座椅安全带</item>
+     <item>标准照片</item> 
      <item>车厢内部</item>
      <item>车辆正后方</item>            
      <item>灭火器</item>            
@@ -156,12 +157,81 @@
      <item>0113</item>
      <item>0111</item>           
      <item>0112</item>  
-     <item>0157</item> 
+     <item>0157</item>
+     <item>0198</item>  
      <item>0115</item>
      <item>0158</item>            
      <item>0116</item>            
      <item>0117</item>
      <item>0118</item>
+     <item>0127</item>                    
+     <item>0119</item>
+     <item>0134</item>
+     <item>0132</item>
+     <item>0130</item>
+     <item>0133</item>
+     <item>0136</item>
+     <item>0154</item>
+     <item>0155</item>
+     <item>0156</item>
+     <item>0135</item>
+     <item>0140</item>
+     <item>0163</item>
+     <item>0126</item>
+     <item>0128</item>
+     <item>0138</item>
+     <item>0139</item>
+     <item>0159</item>
+     <item>0160</item>
+     <item>0161</item>
+  	</string-array> -->
+  	
+  	
+  	<!-- 沭阳使用 -->
+  	<string-array name="photoname">        
+     <item>车辆左前45度</item>
+	 <item>车辆正后方</item>
+	 <item>车辆右后45度</item>
+	 <item>车辆识别代号</item>
+     <item>座椅安全带</item>
+     <item>行驶记录仪</item>  
+     <item>车厢内部</item>
+     <item>标准照片</item>                 
+     <item>灭火器</item>            
+     <item>安全手锤</item>    
+     <item>急救箱</item>            
+     <item>发动机号/柔性标签</item>
+     <item>防抱死制动装置</item>
+     <item>发动机舱灭火装置</item>
+     <item>辅助制动装置</item>
+     <item>前轮盘式制动器</item>
+     <item>左前轮胎规格</item>
+     <item>右前轮胎规格</item>
+     <item>左后轮胎规格</item>
+     <item>右后轮胎规格</item>
+     <item>残疾车操纵辅助装置</item>
+     <item>教练车副制动踏板</item>
+     <item>危险货物运输车标志</item>
+     <item>校车停车指示标志牌</item>
+     <item>校车标志灯照片</item>
+     <item>校车卧铺客车录像监控系统</item>
+     <item>校车辅助倒车装置</item>
+     <item>校车标牌前正面</item>
+     <item>校车标牌前反面</item>
+     <item>校车标牌后正面</item>
+  	</string-array>
+  	<!-- 沭阳使用 -->
+     <string-array name="photocode">        
+     <item>0111</item>
+	 <item>0158</item>
+	 <item>0112</item>
+	 <item>0113</item>
+     <item>0157</item>           
+     <item>0118</item>  
+     <item>0115</item>
+     <item>0198</item>                 
+     <item>0116</item>            
+     <item>0117</item>     
      <item>0127</item>                    
      <item>0119</item>
      <item>0134</item>

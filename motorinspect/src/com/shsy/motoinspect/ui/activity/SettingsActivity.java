@@ -3,8 +3,8 @@ package com.shsy.motoinspect.ui.activity;
 import com.shsy.motoinspect.BaseActivity;
 import com.shsy.motoinspect.CommonConstants;
 import com.shsy.motoinspect.common.TitleBarView;
-import com.shsy.motoinspect.ui.fragment.SettingLoginFrm;
-import com.shsy.motoinspect.ui.fragment.SettingServerFrm;
+import com.shsy.motoinspect.ui.fragment.LoginFrm;
+import com.shsy.motoinspect.ui.fragment.ServerFrm;
 import com.shsy.motoinspect.ui.fragment.OuterCheckFrm;
 import com.shsy.motoinspect.ui.fragment.OuterCheckItemsFrm;
 import com.shsy.motoinspect.ui.fragment.OuterItemFailReasonFrm;
@@ -48,14 +48,14 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
 				title = getResources().getString(R.string.login);
 				mTitleBarView.setTitle(title);
 				mTitleBarView.setBtnLeftOnclickListener(this);
-				ft.replace(R.id.fl_settings, SettingLoginFrm.instantiate(SettingsActivity.this, SettingLoginFrm.class.getName(),null),"SettingLoginFrm");
+				ft.replace(R.id.fl_settings, LoginFrm.instantiate(SettingsActivity.this, LoginFrm.class.getName(),null),"SettingLoginFrm");
 				break;
 				
 			case 0:
 				title = getResources().getString(R.string.server);
 				mTitleBarView.setTitle(title);
 				mTitleBarView.setBtnLeftOnclickListener(this);
-				ft.replace(R.id.fl_settings, SettingServerFrm.instantiate(SettingsActivity.this, SettingServerFrm.class.getName(),null),"SettingServerFrm");
+				ft.replace(R.id.fl_settings, ServerFrm.instantiate(SettingsActivity.this, ServerFrm.class.getName(),null),"SettingServerFrm");
 				break;
 				
 			case OuterCheckItemsFrm.ITEMFAIL:

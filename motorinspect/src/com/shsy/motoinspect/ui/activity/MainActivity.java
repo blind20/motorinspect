@@ -3,19 +3,33 @@ package com.shsy.motoinspect.ui.activity;
 import com.shsy.motoinspect.BaseActivity;
 import com.shsy.motoinspect.BaseApplication;
 import com.shsy.motoinspect.CommonConstants;
-import com.shsy.motoinspect.ui.fragment.SettingLoginFrm;
+import com.shsy.motoinspect.entity.CarListInfoEntity;
+import com.shsy.motoinspect.ui.fragment.DownLineWithReUpLineFrm;
+import com.shsy.motoinspect.ui.fragment.LoginFrm;
+import com.shsy.motoinspect.ui.fragment.ZbzlCarListFrm;
+import com.shsy.motoinspect.ui.fragment.ZbzlCarListFrm.OnZbzlCarListClick;
+import com.shsy.motoinspect.ui.fragment.ZbzlCheckFrm;
 import com.shsy.motoinspect.ui.fragment.PersonInfoFrm;
 import com.shsy.motoinspect.ui.fragment.PullCarToLineFrm;
+import com.shsy.motoinspect.ui.fragment.QDZCheckFrm;
+import com.shsy.motoinspect.ui.fragment.ReCheckCarInfoFrm;
+import com.shsy.motoinspect.ui.fragment.ReCheckListFrm;
 import com.shsy.motoinspect.ui.fragment.RePhotoFrm;
 import com.shsy.motoinspect.ui.fragment.ResetWorkFrm;
+import com.shsy.motoinspect.ui.fragment.SystemSettingFrm;
 import com.shsy.motoinspect.ui.fragment.NavigationFrm;
 import com.shsy.motoinspect.ui.fragment.OuterCheckFrm;
+import com.shsy.motoinspect.ui.fragment.UnfinishedCarListFrm;
+import com.shsy.motoinspect.ui.fragment.VehCheckProcessFrm;
 import com.shsy.motoinspect.utils.Logger;
+import com.shsy.motoinspect.utils.SharedPreferenceUtils;
+import com.shsy.motoinspect.utils.ToolUtils;
 import com.shsy.motorinspect.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -27,8 +41,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 													NavigationFrm.OnMenuSelListener,
 													OuterCheckFrm.OnOuterCheckBackListener,
 													PullCarToLineFrm.OnPullBackListener,
+													PullCarToLineFrm.OnPullVehLsnr,
 													ResetWorkFrm.OnResetBackListener,
-													RePhotoFrm.OnRePhotoBackListener{
+													RePhotoFrm.OnRePhotoBackListener,
+													ReCheckListFrm.OnReCheckListClick,
+													ZbzlCarListFrm.OnZbzlCarListClick,
+													UnfinishedCarListFrm.OnUnfinishedCarListClick,
+													PersonInfoFrm.OnItemSelListener{
 
 	private ImageButton buttom_waijian;
 	private ImageButton buttom_yinche;
@@ -53,10 +72,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 	//标记是否从其他fragment点击返回按钮
 	private boolean isBack = false;
 	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (BaseApplication) getApplication();
+		
+		/*int count = (Integer)SharedPreferenceUtils.get(this, CommonConstants.COUNT, 0);
+		if(count==0){
+			SharedPreferenceUtils.put(this, CommonConstants.UUID, ToolUtils.getUUID(this));
+			SharedPreferenceUtils.put(this, CommonConstants.COUNT, ++count);
+		}*/
 		
 		if(savedInstanceState == null){
 			onClick(buttom_personinfo);
@@ -228,8 +254,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 		}else if(menuTitle.equals(getString(R.string.outer_nav1_menu4))){
 			
 			ft.replace(R.id.fl_carinfo, RePhotoFrm.instantiate(MainActivity.this, RePhotoFrm.class.getName(),bundle));
-		}
+		}else if(menuTitle.equals(getString(R.string.outer_nav2_menu4))||menuTitle.equals(getString(R.string.outer_nav2_menu5))){
 			
+			ft.replace(R.id.fl_carinfo, ZbzlCarListFrm.instantiate(MainActivity.this, ZbzlCarListFrm.class.getName(),bundle));
+			ft.addToBackStack(null);
+		}else if(menuTitle.equals(getString(R.string.outer_nav1_menu5))){
+			
+			ft.replace(R.id.fl_carinfo, ReCheckListFrm.instantiate(MainActivity.this, ReCheckListFrm.class.getName(),bundle));
+			ft.addToBackStack(null);
+		}else if(menuTitle.equals(getString(R.string.outer_nav1_menu6))){
+			
+			ft.replace(R.id.fl_carinfo, UnfinishedCarListFrm.instantiate(MainActivity.this, UnfinishedCarListFrm.class.getName(),bundle));
+			ft.addToBackStack(null);
+		}else if(menuTitle.equals(getString(R.string.outer_nav2_menu6))){
+			
+			ft.replace(R.id.fl_carinfo, DownLineWithReUpLineFrm.instantiate(MainActivity.this, DownLineWithReUpLineFrm.class.getName(),bundle));
+			ft.addToBackStack(null);
+		}
+		
 		ft.commit();
 	}
 
@@ -253,6 +295,66 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 	@Override
 	public void onRePhotoBack() {
 		onOuterCheckBack();
+	}
+
+	/**
+	 * type称重类型：0为整备质量称重，1为驱动轴称重
+	 */
+	@Override
+	public void onZbzlCarItemClick(CarListInfoEntity carinfo,int type) {
+		Bundle bundle = new Bundle();
+		if(carinfo!=null){
+			bundle.putParcelable("carinfo", carinfo);
+		}
+		ft = getSupportFragmentManager().beginTransaction();
+		if(type==0){
+			ft.replace(R.id.fl_carinfo, ZbzlCheckFrm.instantiate(MainActivity.this, ZbzlCheckFrm.class.getName(),bundle));
+		}else{
+			ft.replace(R.id.fl_carinfo, QDZCheckFrm.instantiate(MainActivity.this, QDZCheckFrm.class.getName(),bundle));
+		}
+		ft.addToBackStack(null);
+		ft.commit();
+	}
+
+	@Override
+	public void onReCheckItemClick(CarListInfoEntity carinfo) {
+		Bundle bundle = new Bundle();
+		if(carinfo!=null){
+			bundle.putParcelable("carinfo", carinfo);
+		}
+		ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fl_carinfo, ReCheckCarInfoFrm.instantiate(MainActivity.this, ReCheckCarInfoFrm.class.getName(),bundle));
+		ft.addToBackStack(null);
+		ft.commit();
+	}
+
+	@Override
+	public void onItemSel(int position) {
+		ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fl_carinfo, SystemSettingFrm.instantiate(MainActivity.this, SystemSettingFrm.class.getName(),null));
+		ft.addToBackStack(null);
+		ft.commit();
+	}
+
+	@Override
+	public void onUnfinishedCarListClick(CarListInfoEntity carinfo) {
+		Bundle bundle = new Bundle();
+		if(carinfo!=null){
+			bundle.putParcelable("carinfo", carinfo);
+		}
+		ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fl_carinfo, VehCheckProcessFrm.instantiate(MainActivity.this, VehCheckProcessFrm.class.getName(),bundle));
+		ft.addToBackStack(null);
+		ft.commit();
+	}
+
+	@Override
+	public void onPullVeh() {
+		Bundle bundle = new Bundle();
+		ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fl_carinfo, DownLineWithReUpLineFrm.instantiate(MainActivity.this, DownLineWithReUpLineFrm.class.getName(),bundle));
+		ft.addToBackStack(null);
+		ft.commit();
 	}
 
 }

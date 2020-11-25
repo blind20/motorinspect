@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include android:id="@+id/toptitle" layout="@layout/top"/> 
+    
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+    android:descendantFocusability="blocksDescendants"
+    android:background="@drawable/listitem_bg"
+    android:padding="20dp">
+    
+    <TextView android:id="@+id/tv_device_hint" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        android:text="请选择引车的整备质量设备"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:layout_marginTop="10dp"
+        android:background="#DFEFFF"
+        />
+	
+	<Spinner
+	    android:id="@+id/sp_devices"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:minHeight="50dp"
+	    android:layout_below="@id/tv_device_hint"
+	    android:layout_marginTop="10dp"
+	    android:spinnerMode="dialog" />
+    
+    <Button 
+        android:id="@+id/btn_zbzl_toline"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:text="整备质量引车"
+        android:textColor="#ffffff"
+        android:layout_below="@id/sp_devices"
+        android:background="@drawable/login_btn"
+        android:textSize="16sp"/>
+    
+	
+	<View android:id="@+id/divider" 
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/btn_zbzl_toline"
+        android:layout_marginTop="20dp"
+        android:background="@color/border"
+        />
+	
+	<TextView android:id="@+id/tv_zbzl_hint" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        android:layout_below="@id/divider"
+        android:layout_marginTop="10dp"
+        android:text="整备质量到位操作"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:background="#DFEFFF"
+        />
+    
+
+	<LinearLayout android:id="@+id/ll_zbzl_qzdw"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="10dp"
+	    android:paddingTop="5dp"
+	    android:paddingBottom="5dp"
+	    android:layout_below="@id/tv_zbzl_hint"
+	    android:gravity="center_vertical"
+	    android:orientation="horizontal"
+	    >
+	    <Button
+        android:id="@+id/btn_zbzl_qzdw"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:text="前轴到位"
+        android:textColor="#ffffff"
+        android:background="@drawable/login_btn"
+        android:layout_gravity="center_vertical"
+        android:textSize="16sp"
+        android:onClick="qzdwBtnClick"
+        />
+    
+     <Button
+        android:id="@+id/btn_zbzl_hzdw"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="30dp"
+        android:text="后轴到位"
+        android:textColor="#ffffff"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/login_btn"
+        android:textSize="16sp"
+        />
+	</LinearLayout>
+	
+	<Button android:id="@+id/btn_zzdw"
+	    android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="整轴到位"
+        android:textColor="#ffffff"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/login_btn"
+        android:layout_below="@id/ll_zbzl_qzdw"
+        android:textSize="16sp"/>
+	
+	<View android:id="@+id/divider2" 
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/btn_zzdw"
+        android:layout_marginTop="10dp"
+        android:background="@color/border"
+        />
+	
+	<Button 
+        android:id="@+id/btn_finish"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="结束"
+        android:textColor="#ffffff"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/login_btn"
+        android:textSize="16sp"/>
+	
+</RelativeLayout>
+    
+</LinearLayout>
+
+
+

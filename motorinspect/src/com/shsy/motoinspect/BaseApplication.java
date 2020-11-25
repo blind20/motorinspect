@@ -55,8 +55,8 @@ public class BaseApplication extends Application {
         CookieJarImpl cookieJarImpl = new CookieJarImpl(persistentCookieStore);
 		
         OkHttpClient okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJarImpl)
-							        		.connectTimeout(5000L, TimeUnit.MILLISECONDS)
-											.readTimeout(10000L, TimeUnit.MILLISECONDS)
+							        		.connectTimeout(50000L, TimeUnit.MILLISECONDS)
+											.readTimeout(100000L, TimeUnit.MILLISECONDS)
 											.build();
 		
 		OkHttpUtils.initClient(okHttpClient);
@@ -65,6 +65,8 @@ public class BaseApplication extends Application {
 
 	public String[] initOuterCheckItems(int i){
 		switch(i){
+			case 0:
+				return getResources().getStringArray(R.array.checkitems0);
 			case 1:
 				return getResources().getStringArray(R.array.checkitems1);
 			case 2:

@@ -84,39 +84,7 @@ public class PictureUtil {
 	}
 	
 	
-	 /**
-     * 添加文字到图片，类似水印文字。
-     * @param gContext
-     * @param gResId
-     * @param gText
-     * @return
-     */ 
-    public static Bitmap drawTextToBitmap(Bitmap bitmap, String gText) { 
-   
-        android.graphics.Bitmap.Config bitmapConfig = bitmap.getConfig(); 
-        // set default bitmap config if none 
-        if (bitmapConfig == null) { 
-            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888; 
-        } 
-        bitmap = bitmap.copy(bitmapConfig, true); 
-   
-        Canvas canvas = new Canvas(bitmap); 
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG); 
-        // text color - #3D3D3D 
-        paint.setColor(Color.rgb(177,68,80)); 
-        // text size in pixels 
-        paint.setTextSize(45.0f);
-        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE); 
-   
-        // draw text to the Canvas center 
-        Rect bounds = new Rect(); 
-        paint.getTextBounds(gText, 0, gText.length(), bounds); 
-        int x = (bitmap.getWidth() - bounds.width())/10*9 ; 
-        int y = (bitmap.getHeight() + bounds.height())/10*9; 
-        canvas.drawText(gText, x , y, paint); 
-   
-        return bitmap; 
-    }
+	 
     
 
 	/**
@@ -157,4 +125,78 @@ public class PictureUtil {
 		}
 	}
 	
+	
+	
+	
+	public static Bitmap drawPhotoType(Bitmap bitmap, String gText) { 
+        return drawTextToBitmapByxy(bitmap,gText,10,30); 
+    }
+	public static Bitmap drawJczmc(Bitmap bitmap, String gText) { 
+        return drawTextToBitmapByxy(bitmap,gText,10,60); 
+    }
+	
+	public static Bitmap drawDate(Bitmap bitmap, String gText) { 
+        return drawTextToBitmapByxy(bitmap,gText,10,90); 
+    }
+	
+	public static Bitmap drawTextToBitmapByxy(Bitmap bitmap, String gText,int x,int y) { 
+        android.graphics.Bitmap.Config bitmapConfig = bitmap.getConfig(); 
+        if (bitmapConfig == null) { 
+            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888; 
+        } 
+        bitmap = bitmap.copy(bitmapConfig, true); 
+        Canvas canvas = new Canvas(bitmap); 
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG); 
+        paint.setColor(Color.rgb(177,68,80)); 
+        paint.setTextSize(18.0f);
+        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE); 
+        Rect bounds = new Rect(); 
+        paint.getTextBounds(gText, 0, gText.length(), bounds); 
+        canvas.drawText(gText, x , y, paint);  
+        return bitmap; 
+    }
+	
+	public static Bitmap drawVIN(Bitmap bitmap, String gText) {
+		android.graphics.Bitmap.Config bitmapConfig = bitmap.getConfig(); 
+        if (bitmapConfig == null) { 
+            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888; 
+        } 
+        bitmap = bitmap.copy(bitmapConfig, true); 
+        Canvas canvas = new Canvas(bitmap); 
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG); 
+        paint.setColor(Color.rgb(177,68,80)); 
+        paint.setTextSize(18.0f);
+        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE); 
+        Rect bounds = new Rect(); 
+        paint.getTextBounds(gText, 0, gText.length(), bounds); 
+//        int x = 10; 
+//        int y = (bitmap.getHeight() + bounds.height())/10*9; 
+        int x = bitmap.getWidth()-bounds.width()-10;
+        int y = (bitmap.getHeight() - bounds.height())-20; 
+        canvas.drawText(gText, x , y, paint); 
+        return bitmap; 
+    }
+	
+	
+    public static Bitmap drawTextToBitmap(Bitmap bitmap, String gText) { 
+        android.graphics.Bitmap.Config bitmapConfig = bitmap.getConfig(); 
+        if (bitmapConfig == null) { 
+            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888; 
+        } 
+        bitmap = bitmap.copy(bitmapConfig, true); 
+        Canvas canvas = new Canvas(bitmap); 
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG); 
+        paint.setColor(Color.rgb(177,68,80)); 
+        paint.setTextSize(18.0f);
+        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE); 
+        Rect bounds = new Rect(); 
+        paint.getTextBounds(gText, 0, gText.length(), bounds); 
+        int x = (bitmap.getWidth() - bounds.width())/10*9 ; 
+        int y = (bitmap.getHeight() + bounds.height())/10*9; 
+        canvas.drawText(gText, x , y, paint); 
+        return bitmap; 
+    }
+    
+    
+    
 }

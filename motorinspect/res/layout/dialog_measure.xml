@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@android:color/transparent"
+    android:orientation="vertical">
+
+ <!--    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#169ee5"
+        android:gravity="center"
+        android:text="请输入外廓尺寸"
+        android:textColor="@android:color/white"
+        android:textSize="14sp" /> -->
+
+    <EditText
+        android:layout_marginTop="5dp"
+        android:id="@+id/et_wkc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入外廓长"
+        android:numeric="integer"
+        android:maxLength="6"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/et_wkk"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入外廓宽"
+        android:numeric="integer"
+        android:maxLength="6"
+        android:textSize="18sp" />
+    
+    <EditText
+        android:id="@+id/et_wkg"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入外廓高"
+        android:numeric="integer"
+        android:maxLength="6"
+        android:textSize="18sp" />
+
+</LinearLayout>

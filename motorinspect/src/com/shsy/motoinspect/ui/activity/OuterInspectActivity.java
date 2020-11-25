@@ -1,6 +1,9 @@
 package com.shsy.motoinspect.ui.activity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -13,6 +16,8 @@ import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -42,6 +47,10 @@ import com.shsy.motoinspect.ui.fragment.MyDialogFragment;
 import com.shsy.motoinspect.ui.fragment.OuterCheckFrm;
 import com.shsy.motoinspect.ui.fragment.OuterPhotoFrm;
 import com.shsy.motoinspect.ui.fragment.OuterPhotoFrm2;
+import com.shsy.motoinspect.ui.fragment.RePhotoFrm;
+import com.shsy.motoinspect.ui.fragment.VideoFileFrm;
+import com.shsy.motoinspect.ui.fragment.VideoFileFrm1;
+import com.shsy.motoinspect.ui.fragment.PullCarToLineFrm.SingleClick;
 import com.shsy.motoinspect.ui.fragment.OuterItemFailReasonFrm;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.ProgressDlgUtil;
@@ -65,7 +74,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 	private TabAdapter mAdapter ;
 	private List<Fragment> mFragments;
 	private FragmentManager mManager;
-	
+	private TextView mTextMeasure;
 	
 	private List<CheckItemEntity> mItemsCheckFail;
 	private CarListInfoEntity carInfo;
@@ -78,26 +87,26 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 	private BaseApplication app ;
 	private SparseArray<CheckItemEntity> sparseArray;
 	private String[] jcxmArray;
+	private Integer mCwkc;
+	private Integer mCwkk;
+	private Integer mCwkg;
 	
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		if(savedInstanceState == null){
 			mTabPageIndicator.setViewPager(mViewPager,0);
 		}else{
 			mTabPageIndicator.setViewPager(mViewPager,0);
 		}
-		
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 				.detectDiskReads().detectDiskWrites().detectNetwork()
 				.penaltyLog().build());
 		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 				.detectLeakedSqlLiteObjects().detectLeakedClosableObjects()
 				.penaltyLog().penaltyDeath().build());
-		
 	}
 	
 
@@ -115,7 +124,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 		
 		mTabPageIndicator = (TabPageIndicator)findViewById(R.id.tabIndicator);
 		mViewPager = (ViewPager)findViewById(R.id.viewpager);
-		
+		mTextMeasure = (TextView)findViewById(R.id.tv_measure);
 	}
 
 	
@@ -137,6 +146,10 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 		mFragments = initFragments(mOutCheckType);
 		mAdapter = new TabAdapter(mManager,mFragments,mOutCheckType);
 		mViewPager.setAdapter(mAdapter);
+		if(mOutCheckType==CommonConstants.APPEARANCE){
+			mTextMeasure.setVisibility(View.VISIBLE);
+			mTextMeasure.setOnClickListener(this);
+		}
 	}
 	
 	
@@ -149,7 +162,6 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 		if(jcxmArray == null){
 			Logger.show("getArgumentByIntent", "getArgumentByIntent");
 		}
-		
 	}
 
 
@@ -161,44 +173,44 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 		
 		switch (type) {
 			case CommonConstants.APPEARANCE:
-				int len = 0;
-				int start =1;
-				for(int i=1;i<=4;i++){
-					List<CheckItemEntity> list = new ArrayList<CheckItemEntity>();
-					start += len ;
-					String[] checkitems = app.initOuterCheckItems(i);
-					list = initDatas(checkitems,start,jcxmArray);
-//					list = initDatas(checkitems,start);
-					
-					Bundle bundle = new Bundle();
-					bundle.putString("jylsh", jylsh);
-					bundle.putInt("type", type);
-//					bundle.putStringArray("jcxms", jcxmArray);
-					OuterCheckItemsFrm outerCheckItemsFrm = new OuterCheckItemsFrm(list);
-					outerCheckItemsFrm.setArguments(bundle);
-					fms.add(outerCheckItemsFrm);
-					len = checkitems.length;
-					setValueToSpareArray(list);
+				List<CheckItemEntity> list = new ArrayList<CheckItemEntity>();
+				String[] checkitems = app.initOuterCheckItems(0);
+				list = initDatas(checkitems,1,jcxmArray);
+				for(CheckItemEntity ce1:list){
+					Logger.show("initDatas-wgjcxm", "wgjcxm="+ce1.getSeq()+";flg="+ce1.getCheckflag());
 				}
-				//mPohtos引用取得拍摄的照片种类
+				
 				Bundle bundle = new Bundle();
 				bundle.putString("jylsh", jylsh);
-				bundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, carInfo);
+				bundle.putInt("type", type);
+				OuterCheckItemsFrm outerCheckItemsFrm = new OuterCheckItemsFrm(list);
+				outerCheckItemsFrm.setArguments(bundle);
+				fms.add(outerCheckItemsFrm);
+				setValueToSpareArray(list);
+				
+				//mPohtos引用取得拍摄的照片种类
+				Bundle pbundle = new Bundle();
+				pbundle.putString("jylsh", jylsh);
+				pbundle.putParcelable(CommonConstants.BUNDLE_TO_OUTER, carInfo);
 				OuterPhotoFrm outerPhotoFrm = new OuterPhotoFrm();
-				outerPhotoFrm.setArguments(bundle);
+				outerPhotoFrm.setArguments(pbundle);
 				fms.add(outerPhotoFrm);
+				
+				Bundle vbundle = new Bundle();
+				vbundle.putParcelable("carInfo", carInfo);
+				VideoFileFrm1 videoFileFrm = new VideoFileFrm1();
+				videoFileFrm.setArguments(vbundle);
+				fms.add(videoFileFrm);
 				break;
 	
 			case CommonConstants.CHASSIS:
 				List<CheckItemEntity> chassisList = new ArrayList<CheckItemEntity>();
 				String[] chassisItems = app.initOuterCheckItems(7);
 				chassisList = initDatas(chassisItems,46,jcxmArray);
-//				chassisList = initDatas(chassisItems,46);
 				
 				Bundle bundle2 = new Bundle();
 				bundle2.putString("jylsh", jylsh);
 				bundle2.putInt("type", type);
-//				bundle2.putStringArray("jcxms", jcxmArray);
 				OuterCheckItemsFrm chassis = new OuterCheckItemsFrm(chassisList);
 				chassis.setArguments(bundle2);
 				
@@ -210,12 +222,10 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 				List<CheckItemEntity> dynamicList = new ArrayList<CheckItemEntity>();
 				String[] dynamicLtems = app.initOuterCheckItems(6);
 				dynamicList = initDatas(dynamicLtems,42,jcxmArray);
-//				dynamicList = initDatas(dynamicLtems,42);
 				
 				Bundle bundle3 = new Bundle();
 				bundle3.putString("jylsh", jylsh);
 				bundle3.putInt("type", type);
-//				bundle3.putStringArray("jcxms", jcxmArray);
 				OuterCheckItemsFrm dynamic = new OuterCheckItemsFrm(dynamicList);
 				dynamic.setArguments(bundle3);
 				fms.add(dynamic);
@@ -265,7 +275,7 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 			CheckItemEntity checkitem = new CheckItemEntity();
 			checkitem.setSeq(start+i);
 			checkitem.setTextCheckItem(items[i]);
-			checkitem.setCheckflag(CommonConstants.CHECKPASS);
+			checkitem.setCheckflag(CommonConstants.NOTCHECK);
 			list.add(checkitem);
 		}
 		if(list.get(len-1).getSeq()==42){
@@ -289,20 +299,34 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 
 	@Override
 	public void onClick(View v) {
-
 		switch (v.getId()) {
-
 		case R.id.title_left:
 			finish();
 			break;
-			
 		case R.id.title_right:
-			upload(mOutCheckType);
+			
+			if(SingleClick.isSingle()){
+				Logger.show("PullCarTOLineFrm", "间隔短于3秒算同一次点击");
+				ToastUtils.showToast(OuterInspectActivity.this, "间隔短于3秒算同一次点击", Toast.LENGTH_SHORT);
+			}else{
+				upload(mOutCheckType);
+			}
+			break;
+		case R.id.tv_measure:
+			if(mOutCheckType==CommonConstants.APPEARANCE){
+				measureDialog();
+			}
+//			else if(mOutCheckType==CommonConstants.CHASSIS){
+//				selectLineDialog(carInfo);
+//			}
 			break;
 		}
 	}
 	
 	
+
+	
+
 
 	private void upload(int mOutCheckType) {
 		if(mOutCheckType == CommonConstants.REPHOTO){
@@ -336,8 +360,6 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 		if(TextUtils.isEmpty(url)){
 			return;
 		}
-		
-		
 		
 		ProgressDlgUtil.showProgressDialog(this, "正在上传,请等待...");
 		
@@ -393,6 +415,14 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 			map.put("Item"+seq, Integer.toString(flag));
 			Logger.show(TAG, "item"+seq+":"+flag+"\n\r");
 		}
+		if(mOutCheckType == CommonConstants.APPEARANCE ){
+			if(mCwkc!=null&&mCwkc!=0&&mCwkg!=null&&mCwkg!=0&&mCwkk!=null&&mCwkk!=0){
+				map.put("cwkc", Integer.toString(mCwkc));
+				map.put("cwkk", Integer.toString(mCwkk));
+				map.put("cwkg", Integer.toString(mCwkg));
+			}
+		}
+		
 		return map;
 	}
 	
@@ -403,6 +433,59 @@ OuterCheckItemsFrm.OnClickCheckItemListener{
 		sparseArray.put(item.getSeq(), item);
 	}
 
-
+	private void measureDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = View.inflate(this, R.layout.dialog_measure, null);
+        final EditText et_wkc= (EditText) dialogView.findViewById(R.id.et_wkc);
+        final EditText et_wkk= (EditText) dialogView.findViewById(R.id.et_wkk);
+        final EditText et_wkg= (EditText) dialogView.findViewById(R.id.et_wkg);
+        if(mCwkc!=null&&mCwkc!=0){
+        	et_wkc.setText(String.valueOf(mCwkc));
+        }
+        if(mCwkk!=null&&mCwkk!=0){
+        	et_wkk.setText(String.valueOf(mCwkk));
+        }
+        if(mCwkg!=null&&mCwkg!=0){
+        	et_wkg.setText(String.valueOf(mCwkg));
+        }
+        builder.setView(dialogView).setTitle(R.string.measure);
+        builder.setPositiveButton(R.string.positive, new OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String wkc = et_wkc.getText().toString().trim();
+				String wkk = et_wkk.getText().toString().trim();
+				String wkg = et_wkg.getText().toString().trim();
+				if(!TextUtils.isEmpty(wkc) && !TextUtils.isEmpty(wkk) && !TextUtils.isEmpty(wkg)){
+					mCwkc = Integer.parseInt(wkc);
+					mCwkk = Integer.parseInt(wkk);
+					mCwkg = Integer.parseInt(wkg);
+					mTextMeasure.setText("外廓值:"+wkc+","+wkk+","+wkg);
+				}
+			}
+		}).setNegativeButton(R.string.negative, new OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			}
+		}).show();
+	}
 	
+	public static class SingleClick {
+		private static final int DEFAULT_TIME = 3000;
+		private static long lastTime;
+
+		public static boolean isSingle() {
+			boolean isSingle;
+			long currentTime = System.currentTimeMillis();
+			if (currentTime - lastTime <= DEFAULT_TIME) {
+				isSingle = true;
+			} else {
+				isSingle = false;
+			}
+			lastTime = currentTime;
+
+			return isSingle;
+		}
+	}
 }

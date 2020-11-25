@@ -276,9 +276,7 @@ public class OuterPhotoFrm extends BaseFragment {
 		mGridView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				
 				mPosition = position;
-				
 				if(!TextUtils.isEmpty(mInitList.get(position).getUploadPhotoFilePath())){
 					//查看照片
 					viewImgHasPhoto(position);
@@ -328,9 +326,6 @@ public class OuterPhotoFrm extends BaseFragment {
 		intent.setDataAndType(Uri.parse("file://"+mInitList.get(position).getUploadPhotoFilePath()), "image/*");
 		startActivity(intent);
 	}
-	 
-	
-	
 
 	/**
 	 * 获取照片的方法：
@@ -504,9 +499,48 @@ public class OuterPhotoFrm extends BaseFragment {
 		options.inSampleSize = scale;
 		options.inPurgeable = true;
 		options.inJustDecodeBounds = false;
-		Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
 		
-		return PictureUtil.drawTextToBitmap(bitmap, ToolUtils.getCurDate());
+		
+		
+		/*
+		CarPhotoEntity carPhoto = mInitList.get(mPosition);
+		String pn = carPhoto.getPhotoTypeName()+"照片";
+		String vin = carInfo.getClsbdh();
+		String jczmc = (String) SharedPreferenceUtils.get(mActivity, CommonConstants.STATION, "检测站");
+		
+		
+		Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+		bitmap = PictureUtil.drawDate(bitmap, ToolUtils.getCurDate()); 
+		bitmap  =PictureUtil.drawPhotoType(bitmap, pn);
+		bitmap  =PictureUtil.drawJczmc(bitmap, jczmc);
+		if(!TextUtils.isEmpty(vin)){
+			bitmap  =PictureUtil.drawVIN(bitmap, vin);
+		}*/
+		CarPhotoEntity carPhoto = mInitList.get(mPosition);
+		String row1 = ToolUtils.getCurDate()+" 操作员:"
+				+(String)SharedPreferenceUtils.get(mActivity, CommonConstants.REALNAME, "")
+				+" IMEI:"+ToolUtils.getIMEI();
+		String row2 = "照片名称:"+carPhoto.getPhotoTypeCode()+carPhoto.getPhotoTypeName();
+		String row3 = "流水号:"+carInfo.getLsh();
+		String row4 = "号牌号码:";
+		if(!TextUtils.isEmpty(carInfo.getHphm())){
+			row4 = row4 + carInfo.getHphm();
+		}
+		String row5 = "号牌种类:";
+		if(!TextUtils.isEmpty(carInfo.getHphm())){
+			row5 = row5 + carInfo.getHpzl();
+		}
+		String row6 = "车架号:"+carInfo.getClsbdh();
+		
+		Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+		bitmap = PictureUtil.drawTextToBitmapByxy(bitmap, row1, 10, 30); 
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row2, 10, 60);
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row3, 10, 90);
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row4, 10, 120);
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row5, 10, 150);
+		bitmap  = PictureUtil.drawTextToBitmapByxy(bitmap, row6, 10, 180);
+		
+		return bitmap;
 	}
 	
 

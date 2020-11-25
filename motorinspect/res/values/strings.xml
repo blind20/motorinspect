@@ -3,7 +3,9 @@
     <string name="app_name">車检终端</string>
 
     <string name="aspectcheck">外观查验</string>
-
+	<string name="zbzlcarlist">整备质量待检车辆</string>
+	<string name="zbzlcheck">整备质量检测</string>
+	<string name="qdzczcarlist">独立驱动轴称重待检车辆</string>
     <string name="waitinspectcar">外观待检车辆</string>
     <string name="pullcar">引车上线</string>
     <string name="dynamic_check_car">底盘动态待检车辆</string>
@@ -11,6 +13,9 @@
     <string name="workreset">复位工位</string>
     <string name="roadtest_pullcar">路试引车</string>
     <string name="reset">复位</string>
+    <string name="recheck_car_list">复检车辆列表</string>
+    <string name="recheck_car_list">查询检测未完成车辆列表</string>
+    
 
     <string name="checkpass">合格</string>
     <string name="checkfail">不合格</string>
@@ -41,17 +46,27 @@
     <string name="outer_nav1_menu2">底盘动态检查</string>
     <string name="outer_nav1_menu3">底盘部件检查</string>
     <string name="outer_nav1_menu4">重新拍照或补拍</string>
+    <string name="outer_nav1_menu5">复检车辆</string>
+    <string name="outer_nav1_menu6">查询检验过程</string>
     <string name="outer_nav2_menu1">引车上线</string>
     <string name="outer_nav2_menu2">工位复位</string>
     <string name="outer_nav2_menu3">路试引车</string>
+    <string name="outer_nav2_menu4">整备质量检测</string>
+    <string name="outer_nav2_menu5">独立驱动轴称重</string>
+    <string name="outer_nav2_menu6">退线及重新上线</string>
     
     <string name="outer_nav1_menu1_des">车辆唯一性,车辆特征参数,车辆外观,安全装置,拍摄外观照片</string>
     <string name="outer_nav1_menu2_des">包含底盘动态检查</string>
     <string name="outer_nav1_menu3_des">包含底盘部件检查</string>
     <string name="outer_nav1_menu4_des">外观照片重新拍照或补拍照片</string>
+    <string name="outer_nav1_menu5_des">复检车辆</string>
+    <string name="outer_nav1_menu6_des">查询车辆的检验过程及状态</string>
     <string name="outer_nav2_menu1_des">引车员引车上线</string>
     <string name="outer_nav2_menu2_des">终端上复位工位</string>
     <string name="outer_nav2_menu3_des">路试引车上线</string>
+    <string name="outer_nav2_menu4_des">若有整备质量，使用整备质量值</string>
+    <string name="outer_nav2_menu5_des">若无整备质量，使用独立驱动轴称重</string>
+    <string name="outer_nav2_menu6_des">退线及重新上线</string>
     
     <string name="veh_jcx">号检测线</string>
     <string name="veh_sendback">退办</string>
@@ -76,4 +91,14 @@
 	<string name="starttime">开始时间：</string>
 	<string name="endtime">结束时间：</string>
 	<string name="is_must_photo">淡红色照片种类表示必须要拍摄</string>
+	<string name="measure">人工测量外廓</string>
+	
+	
+	<string name="line_cylinder">滚筒线</string>
+	<string name="line_plate">平板线</string>
+	<string name="line_is_jz">加载线</string>
+	<string name="line_not_jz">非加载线</string>
+	
+	<string name="system_setting_0">启用引车选线号</string>
+	<string name="system_setting_1">检测站名称</string>
 </resources>

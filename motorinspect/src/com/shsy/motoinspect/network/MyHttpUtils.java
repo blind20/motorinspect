@@ -58,4 +58,18 @@ public class MyHttpUtils {
 		}
 		builder.build().execute(callback);
 	}
+	
+	public void postHttpVideo(String url,File file,Map<String, String> map,StringCallback callback){
+		String session = (String) SharedPreferenceUtils.get(mContext, CommonConstants.JSESSIONID, "");
+		if(TextUtils.isEmpty(session)){
+			return;
+		}
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("Cookie", "JSESSIONID="+session);
+		PostFormBuilder builder = OkHttpUtils.post().addFile("videoFile", "videoFile", file).url(url).headers(headers);
+		for(Map.Entry<String, String> entry: map.entrySet()){
+			builder.addParams(entry.getKey(),entry.getValue());
+		}
+		builder.build().connTimeOut(50000).readTimeOut(50000).writeTimeOut(500000).execute(callback);
+	}
 }

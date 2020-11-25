@@ -1,17 +1,11 @@
 package com.shsy.motoinspect.ui.fragment;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.shsy.motoinspect.BaseFragment;
 import com.shsy.motoinspect.CommonConstants;
-import com.shsy.motoinspect.common.CommonAdapter;
-import com.shsy.motoinspect.common.ViewHolder;
-import com.shsy.motoinspect.entity.CheckItemEntity;
 import com.shsy.motoinspect.utils.Logger;
 import com.shsy.motoinspect.utils.SharedPreferenceUtils;
 import com.shsy.motoinspect.utils.ToastUtils;
@@ -20,30 +14,20 @@ import com.shsy.motorinspect.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import okhttp3.Call;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
-public class SettingLoginFrm extends BaseFragment {
+public class LoginFrm extends BaseFragment {
 
 	private EditText et_username;
 	private EditText et_password;
@@ -58,7 +42,7 @@ public class SettingLoginFrm extends BaseFragment {
 		public void onLogin();
 	}
 	
-	public SettingLoginFrm(){
+	public LoginFrm(){
 	}
 	
 	
@@ -143,12 +127,19 @@ public class SettingLoginFrm extends BaseFragment {
 									ToastUtils.showToast(mActivity, "·µ»Ø¿Õ", Toast.LENGTH_LONG);
 									return;
 								}
+								Logger.show("onResponse", "resp="+response);
 								JSONObject jo = new JSONObject(response);
 								Integer state = (Integer) jo.get("state");
 								String sessionId = jo.getString("session");
+								String realName="";
+								if(jo.getJSONObject("data")!=null){
+									realName = jo.getJSONObject("data").getString("realName");
+								}
+								
 								if(CommonConstants.STATAS_SUCCESS==state){
 									SharedPreferenceUtils.put(mActivity, CommonConstants.USERNAME, usrname);
 									SharedPreferenceUtils.put(mActivity, CommonConstants.PWD, pwd);
+									SharedPreferenceUtils.put(mActivity, CommonConstants.REALNAME, realName);
 									SharedPreferenceUtils.put(mActivity, CommonConstants.JSESSIONID, sessionId);
 									Intent intent = new Intent();
 									intent.putExtra(CommonConstants.USERNAME, usrname);

@@ -180,8 +180,6 @@ public class ResetWorkFrm extends BaseFragment implements SwipeRefreshLayout.OnR
 		/*--------------------------测试代码-----------------------------------------*/
 //		mWorkStationList.add(new WorkStation("2号检测线","3号工位"));
 //		viewSetAdapter();
-		
-		
 		/*---------------------------正式代码----------------------------------------*/
 		String url = ToolUtils.getWorkPointsUrl(mActivity);
 		getWorkStationListNetwork(url);

@@ -17,6 +17,7 @@ public class CommonConstants {
 	public final static int S_EXCEPTION = 500;// 服务器出错
 	
 	
+	
 	/**
 	 * 请求返回状态
 	 */
@@ -60,9 +61,12 @@ public class CommonConstants {
 	public final static String IP = "ip";
 	public final static String PORT = "port";
 	public final static String USERNAME = "username";
+	public final static String REALNAME = "realName";
 	public final static String PWD = "password";
 	public final static String JSESSIONID = "sessionid";
-	
+	//启动次数
+	public final static String COUNT = "count";
+	public final static String UUID = "uuid";
 	
 	
 	//startActivityForResult request code
@@ -92,4 +96,14 @@ public class CommonConstants {
 	public final static int DAYS7 = 7;
 	public final static int DAYS14 = 14;
 	public final static int DAYS30 = 30;
+	public final static int DAYS90 = 90;
+	
+	//滚筒线、平板线
+	public final static String CYLINDERLINE  = "0";
+	public final static String PLATELINE = "1";
+	
+	//系统设置
+	//启用引车是否选线号
+	public final static String IS_SELECT_LINE  = "is_select_line";
+	public final static String STATION = "station";
 }

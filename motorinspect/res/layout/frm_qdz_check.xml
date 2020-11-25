@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include android:id="@+id/toptitle" layout="@layout/top"/> 
+    
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+    android:descendantFocusability="blocksDescendants"
+    android:background="@drawable/listitem_bg"
+    android:padding="20dp">
+    
+    <TextView android:id="@+id/tv_device_hint" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        android:text="独立驱动轴称重引车操作"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:layout_marginTop="10dp"
+        android:background="#DFEFFF"
+        />
+	
+    <Spinner
+	    android:id="@+id/sp_devices"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:minHeight="50dp"
+	    android:layout_below="@id/tv_device_hint"
+	    android:layout_marginTop="10dp"
+	    android:spinnerMode="dialog" />
+    
+    <Button 
+        android:id="@+id/btn_qdz_toline"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:text="独立驱动轴称重引车"
+        android:textColor="#ffffff"
+        android:layout_below="@id/sp_devices"
+        android:background="@drawable/login_btn"
+        android:textSize="16sp"/>
+    
+	
+	<View android:id="@+id/divider" 
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/btn_qdz_toline"
+        android:layout_marginTop="10dp"
+        android:background="@color/border"
+        />
+	
+	<TextView android:id="@+id/tv_zbzl_hint" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textColor="#898989"
+        android:textSize="12sp"
+        android:layout_below="@id/divider"
+        android:layout_marginTop="10dp"
+        android:text="独立驱动轴到位操作"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:background="#DFEFFF"
+        />
+    
+	
+
+	<Button
+        android:id="@+id/btn_qdz_dw"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:text="驱动轴到位"
+        android:textColor="#ffffff"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/login_btn"
+        android:textSize="16sp"
+        android:layout_below="@id/tv_zbzl_hint"
+        />
+	
+	<View android:id="@+id/divider2" 
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/btn_qdz_dw"
+        android:layout_marginTop="10dp"
+        android:background="@color/border"
+        />
+	
+	<Button 
+        android:id="@+id/btn_finish"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="结束"
+        android:textColor="#ffffff"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/login_btn"
+        android:textSize="16sp"/>
+	
+</RelativeLayout>
+    
+</LinearLayout>
+
+
+

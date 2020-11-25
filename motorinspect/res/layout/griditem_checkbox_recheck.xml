@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center" >
+
+    <TextView  
+        android:id="@+id/item_jyxmzl"  
+        android:layout_width="0dp"  
+        android:layout_height="wrap_content"  
+        android:layout_weight="1"  
+        android:gravity="center_vertical"  
+        android:visibility="gone" />  
+    <TextView  
+        android:id="@+id/item_jyxm"  
+        android:layout_width="wrap_content"  
+        android:layout_height="wrap_content"  
+        android:visibility="gone"
+        android:gravity="center_vertical" />
+    
+    <CheckBox
+        android:id="@+id/item_cb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="复检项目"
+        android:clickable="false"  
+        android:focusable="false"
+        android:textSize="12sp" />
+    
+
+</FrameLayout>
